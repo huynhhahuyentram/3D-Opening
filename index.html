@@ -9,9 +9,11 @@
 <body>
 
 <div class="app">
+    <!-- Màn hình Canvas 3D -->
     <canvas id="view"></canvas>
 
     <div class="panel">
+        <!-- Bảng 2 cột: Position và Dimension -->
         <div class="row">
             <div class="box">
                 <h3>Position (mm)</h3>
@@ -25,13 +27,14 @@
             <div class="box">
                 <h3>Dimension (mm)</h3>
                 <div class="input-grid">
-                    <label>L <input id="dx" type="number" value="1000"></label>
-                    <label>W <input id="dy" type="number" value="500"></label>
-                    <label>H <input id="dz" type="number" value="300"></label>
+                    <label>Length [mm] <input id="dx" type="number" value="0"></label>
+                    <label>Width [mm] <input id="dy" type="number" value="0"></label>
+                    <label>Height [mm] <input id="dz" type="number" value="0"></label>
                 </div>
             </div>
         </div>
 
+        <!-- Bo góc -->
         <div class="box">
             <h3>Corner Radius (mm)</h3>
             <div class="radius">
@@ -42,6 +45,7 @@
             </div>
         </div>
 
+        <!-- Orientation: Mặt phẳng vuông góc với trục -->
         <div class="box">
             <h3>Orientation</h3>
             <div class="ori">
@@ -51,6 +55,7 @@
             </div>
         </div>
 
+        <!-- Nút bấm chức năng -->
         <div class="btns">
             <button class="ok" onclick="saveFile()">OK (Export MAC)</button>
             <button class="voice" onclick="voice()">🎤 Voice</button>
