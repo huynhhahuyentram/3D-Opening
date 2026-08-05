@@ -10,13 +10,25 @@ function setOri(o) {
     draw();
 }
 
+// Hàm hỗ trợ đọc số an toàn (xóa dấu phân cách hàng nghìn nếu gõ thủ công)
+function parseInputValue(id) {
+    let raw = (document.getElementById(id).value || "").toString().trim();
+    if (!raw) return 0;
+    if (/^\d+[.,]\d{3}$/.test(raw)) {
+        raw = raw.replace(/[.,]/g, '');
+    } else {
+        raw = raw.replace(',', '.');
+    }
+    return parseFloat(raw) || 0;
+}
+
 function draw() {
     c.width = c.offsetWidth;
     c.height = 280;
 
-    let L = +document.getElementById("dx").value || 0;
-    let W = +document.getElementById("dy").value || 0;
-    let H = +document.getElementById("dz").value || 0;
+    let L = parseInputValue("dx");
+    let W = parseInputValue("dy");
+    let H = parseInputValue("dz");
 
     ctx.clearRect(0, 0, c.width, c.height);
 
@@ -188,11 +200,19 @@ function processFullVoiceNLP(t) {
     let str = t.toLowerCase();
     let updatedCount = 0;
 
+    // Sửa xử lý chuẩn hóa số: xóa phân cách hàng nghìn (5.000 / 5,000 -> 5000)
+    const cleanNumberString = (numStr) => {
+        if (/^\d+[.,]\d{3}$/.test(numStr)) {
+            return numStr.replace(/[.,]/g, '');
+        }
+        return numStr.replace(',', '.');
+    };
+
     const findVal = (keywords) => {
         for (let kw of keywords) {
             let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\d+(?:[.,]\\d+)?)`, "i");
             let match = str.match(regex);
-            if (match) return match[1].replace(',', '.');
+            if (match) return cleanNumberString(match[1]);
         }
         return null;
     };
@@ -235,9 +255,9 @@ function processFullVoiceNLP(t) {
     if (updatedCount === 0) {
         let rawNums = str.match(/\d+([.,]\d+)?/g);
         if (rawNums && rawNums.length >= 3) {
-            document.getElementById("dx").value = rawNums[0].replace(',', '.');
-            document.getElementById("dy").value = rawNums[1].replace(',', '.');
-            document.getElementById("dz").value = rawNums[2].replace(',', '.');
+            document.getElementById("dx").value = cleanNumberString(rawNums[0]);
+            document.getElementById("dy").value = cleanNumberString(rawNums[1]);
+            document.getElementById("dz").value = cleanNumberString(rawNums[2]);
             updatedCount = 3;
         }
     }
@@ -262,18 +282,18 @@ function speak(t) {
 
 /* 4. CHỈNH SỬA CHUẨN ORI KHI XUẤT FILE .MAC THEO ĐÚNG HƯỚNG ĐƯỢC CHỌN */
 function saveFile() {
-    let px = +document.getElementById("px").value || 0;
-    let py = +document.getElementById("py").value || 0;
-    let pz = +document.getElementById("pz").value || 0;
+    let px = parseInputValue("px");
+    let py = parseInputValue("py");
+    let pz = parseInputValue("pz");
 
-    let L = +document.getElementById("dx").value || 0;
-    let W = +document.getElementById("dy").value || 0;
-    let H = +document.getElementById("dz").value || 0;
+    let L = parseInputValue("dx");
+    let W = parseInputValue("dy");
+    let H = parseInputValue("dz");
 
-    let r1 = document.getElementById("r1").value || 0;
-    let r2 = document.getElementById("r2").value || 0;
-    let r3 = document.getElementById("r3").value || 0;
-    let r4 = document.getElementById("r4").value || 0;
+    let r1 = parseInputValue("r1");
+    let r2 = parseInputValue("r2");
+    let r3 = parseInputValue("r3");
+    let r4 = parseInputValue("r4");
 
     // Xác định chính xác chuỗi ORI theo biến ORI đang được chọn
     let oriStr = "ORI Y is Y and Z is Z";
