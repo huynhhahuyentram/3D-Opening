@@ -285,7 +285,7 @@ function speak(t) {
     window.speechSynthesis.speak(u);
 }
 
-/* CHỈ SỬA LOGIC XUẤT ORI TƯƠNG ỨNG NÚT BẤM */
+/* ĐÃ ĐIỀU CHỈNH: ÁNH XẠ BIẾN ORI SANG CHUỖI CÚ PHÁP TƯƠNG ỨNG VỚI AH_X, AH_Y, AH_Z */
 function saveFile() {
     let px = +document.getElementById("px").value || 0;
     let py = +document.getElementById("py").value || 0;
@@ -300,7 +300,7 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
-    let oriString = "ORI Y is Y and Z is Z";
+    let oriString = "ORI Y is -X and Z is Y"; // Mặc định cho Y
     if (ORI === "X") {
         oriString = "ORI Y is Y and Z is X";[cite: 1]
     } else if (ORI === "Y") {
@@ -352,7 +352,7 @@ END`;
     let blob = new Blob([data], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `Opening.mac`;
+    a.download = `Opening_${ORI}.mac`;
     a.click();
 }
 
