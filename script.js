@@ -44,6 +44,7 @@ function draw() {
     let cx = c.width / 2;
     let cy = c.height / 2 + 20;
 
+    // SỬA LỖI 1: Áp dụng đúng thứ tự tham số vẽ trục (L -> X, W -> Y, H -> Z)
     if (ORI === "Z") {
         drawBox3D(cx, cy, l, w, h, R1, R2, R3, R4, `L = ${L}`, `W = ${W}`, `H = ${H}`);
     } else if (ORI === "X") {
@@ -59,22 +60,25 @@ function drawAxis() {
 
     let x0 = 50, y0 = 220;
 
+    // Trục X (Đỏ) - Đi sang phải
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 45, y0);
+    ctx.lineTo(x0 + 45, y0 + 26);
     ctx.stroke();
-    ctx.fillText("X", x0 + 50, y0 + 4);
+    ctx.fillText("X", x0 + 50, y0 + 30);
 
+    // Trục Y (Xanh nước biển) - Đi sang trái
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 32, y0 - 24);
+    ctx.lineTo(x0 - 45, y0 + 26);
     ctx.stroke();
-    ctx.fillText("Y", x0 + 36, y0 - 26);
+    ctx.fillText("Y", x0 - 58, y0 + 30);
 
+    // Trục Z (Xanh lá cây) - Đi thẳng đứng
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
@@ -84,6 +88,7 @@ function drawAxis() {
     ctx.fillText("Z", x0 - 4, y0 - 50);
 }
 
+// SỬA LỖI 1: Chuẩn hóa phép chiếu Isometric bàn tay phải (X sang phải, Y sang trái)
 function projectISO(x, y, z, cx, cy) {
     let cos30 = 0.866;
     let sin30 = 0.5;
@@ -121,8 +126,8 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     ctx.strokeStyle = "#1e293b";
     ctx.fillStyle = "rgba(45, 137, 239, 0.2)";
 
-    let offsetX = cx - d1/2;
-    let offsetY = cy - d2/2;
+    let offsetX = cx - (d1 - d2) * 0.433;
+    let offsetY = cy - (d1 + d2) * 0.25;
 
     pathLoop(ctx, d1, d2, 0, offsetX, offsetY, r1, r2, r3, r4);
     ctx.stroke();
@@ -152,6 +157,7 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     ctx.fill();
     ctx.stroke();
 
+    // SỬA LỖI 1: Hiển thị đúng nhãn L trên cạnh X (song song đường đỏ)
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 13px Segoe UI";
     
@@ -159,7 +165,7 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     let c2 = projectISO(0, d2 / 2, 0, offsetX, offsetY);
     let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
 
-    ctx.fillText(lbl1, c1.x - 15, c1.y + 20);
+    ctx.fillText(lbl1, c1.x + 10, c1.y + 15);
     ctx.fillText(lbl2, c2.x - 55, c2.y + 15);
     ctx.fillText(lbl3, c3.x - 55, c3.y - 5);
 }
@@ -170,7 +176,6 @@ function log(t) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-/* KÍCH HOẠT VOICE CHAT */
 function voice() {
     speak("Xin chào, tôi có thể giúp gì cho bạn");
     log("🤖 Xin chào, tôi có thể giúp gì cho bạn");
@@ -196,16 +201,13 @@ function voice() {
     }, 2200);
 }
 
-/* XỬ LÝ NLP GIỌNG NÓI TỰ NHIÊN - TỰ ĐỘNG BẮT TẤT CẢ CÁC CỘT (POSITION, DIMENSION, RADIUS) */
 function processFullVoiceNLP(t) {
     log("👤 " + t);
     let str = t.toLowerCase();
     let updatedCount = 0;
 
-    // Hàm hỗ trợ tìm số đứng gần từ khóa
     const findVal = (keywords) => {
         for (let kw of keywords) {
-            // Khớp dạng "từ khóa + (là/bằng/:)? + số"
             let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\d+(?:[.,]\\d+)?)`, "i");
             let match = str.match(regex);
             if (match) return match[1].replace(',', '.');
@@ -213,7 +215,6 @@ function processFullVoiceNLP(t) {
         return null;
     };
 
-    // 1. Trích xuất Position (X, Y, Z)
     let posX = findVal(["vị trí x", "pos x", "tọa độ x", "position x"]);
     let posY = findVal(["vị trí y", "pos y", "tọa độ y", "position y"]);
     let posZ = findVal(["vị trí z", "pos z", "tọa độ z", "position z"]);
@@ -222,7 +223,6 @@ function processFullVoiceNLP(t) {
     if (posY !== null) { document.getElementById("py").value = posY; updatedCount++; }
     if (posZ !== null) { document.getElementById("pz").value = posZ; updatedCount++; }
 
-    // 2. Trích xuất Dimension (Length, Width, Height)
     let len = findVal(["chiều dài", "độ dài", "dài", "length"]);
     let wid = findVal(["chiều rộng", "độ rộng", "rộng", "width"]);
     let hei = findVal(["chiều cao", "độ cao", "cao", "height"]);
@@ -231,7 +231,6 @@ function processFullVoiceNLP(t) {
     if (wid !== null) { document.getElementById("dy").value = wid; updatedCount++; }
     if (hei !== null) { document.getElementById("dz").value = hei; updatedCount++; }
 
-    // 3. Trích xuất Corner Radius (R1, R2, R3, R4)
     let rad1 = findVal(["r1", "radius 1", "bo góc 1"]);
     let rad2 = findVal(["r2", "radius 2", "bo góc 2"]);
     let rad3 = findVal(["r3", "radius 3", "bo góc 3"]);
@@ -243,7 +242,6 @@ function processFullVoiceNLP(t) {
     if (rad3 !== null) { document.getElementById("r3").value = rad3; updatedCount++; }
     if (rad4 !== null) { document.getElementById("r4").value = rad4; updatedCount++; }
     
-    // Nếu chỉ nói chung chung "bo góc 100" hoặc "bán kính 100" -> tự gán cho cả 4 góc
     if (radAll !== null && rad1 === null && rad2 === null && rad3 === null && rad4 === null) {
         document.getElementById("r1").value = radAll;
         document.getElementById("r2").value = radAll;
@@ -252,7 +250,6 @@ function processFullVoiceNLP(t) {
         updatedCount++;
     }
 
-    // 4. Nếu đọc liên tiếp 3 số tự nhiên (Trường hợp đọc nhanh: "2000 1000 300")
     if (updatedCount === 0) {
         let rawNums = str.match(/\d+([.,]\d+)?/g);
         if (rawNums && rawNums.length >= 3) {
@@ -263,7 +260,6 @@ function processFullVoiceNLP(t) {
         }
     }
 
-    // Cập nhật lại hình ảnh & Phản hồi
     if (updatedCount > 0) {
         draw();
         speak("File của bạn đã được tạo xong");
