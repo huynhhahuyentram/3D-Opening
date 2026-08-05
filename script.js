@@ -4,7 +4,7 @@ const ctx = c.getContext("2d");
 let ORI = "Z";
 
 function setOri(o) {
-    ORI = o;
+    ORI = o.toUpperCase(); // Đồng bộ biến ORI luôn là chữ viết hoa (X, Y, Z)
     document.querySelectorAll(".ori button").forEach(b => b.classList.remove("active"));
     document.getElementById("o" + o.toLowerCase()).classList.add("active");
     draw();
@@ -311,13 +311,15 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
-    // Định hướng ORI chính xác theo ảnh tham chiếu
+    // Ép kiểu chuỗi để tránh lỗi chữ hoa / chữ thường khi kiểm tra
+    let currentOri = (ORI || "").toUpperCase();
     let oriString = "ORI Y is Y and Z is Z";
-    if (ORI === "X") {
+
+    if (currentOri === "X") {
         oriString = "ORI Y is Y and Z is X";[cite: 1]
-    } else if (ORI === "Y") {
+    } else if (currentOri === "Y") {
         oriString = "ORI Y is -X and Z is Y";[cite: 2]
-    } else if (ORI === "Z") {
+    } else if (currentOri === "Z") {
         oriString = "ORI Y is Y and Z is Z";[cite: 3]
     }
 
