@@ -1,1 +1,162 @@
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #eef2f7;
+    font-size: 14px;
+    padding: 20px 0;
+}
+
+.app {
+    width: 900px;
+    margin: auto;
+}
+
+#view {
+    width: 100%;
+    height: 260px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: block;
+}
+
+.panel {
+    background: #ffffff;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.row {
+    display: flex;
+    gap: 20px;
+}
+
+.box {
+    flex: 1;
+    margin-bottom: 15px;
+}
+
+h3 {
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #3498db;
+    display: inline-block;
+    padding-bottom: 3px;
+}
+
+.input-grid {
+    display: flex;
+    gap: 10px;
+}
+
+.input-grid label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    color: #555;
+    flex: 1;
+}
+
+input {
+    width: 100%;
+    height: 34px;
+    margin-top: 4px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0 8px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+input:focus {
+    border-color: #3498db;
+}
+
+.radius {
+    display: flex;
+    gap: 15px;
+}
+
+.radius label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    font-weight: 600;
+    color: #555;
+}
+
+.ori {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.ori button {
+    width: 70px;
+    height: 35px;
+    border: none;
+    border-radius: 6px;
+    background: #e0e0e0;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ori button:hover {
+    background: #d0d0d0;
+}
+
+.ori .active {
+    background: #2d89ef;
+    color: #ffffff;
+}
+
+.btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btns button {
+    flex: 1;
+    height: 42px;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btns button:hover {
+    opacity: 0.9;
+}
+
+.ok { background: #2d89ef; }
+.voice { background: #9b59b6; }
+.help { background: #17a2b8; }
+.reset { background: #e74c3c; }
+
+#chat {
+    height: 100px;
+    margin-top: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 13px;
+    color: #333;
+}
