@@ -41,10 +41,10 @@ function draw() {
     let R3 = Math.min(r3 * scale, l / 2, w / 2);
     let R4 = Math.min(r4 * scale, l / 2, w / 2);
 
-    let cx = c.width / 2;
-    let cy = c.height / 2 + 20;
+    let cx = c.width / 2 - 40;
+    let cy = c.height / 2 + 30;
 
-    // SỬA LỖI 1: Áp dụng đúng thứ tự tham số vẽ trục (L -> X, W -> Y, H -> Z)
+    // Vẽ hình 3D theo đúng hệ tọa độ đã chuẩn hóa (Hình 2)
     if (ORI === "Z") {
         drawBox3D(cx, cy, l, w, h, R1, R2, R3, R4, `L = ${L}`, `W = ${W}`, `H = ${H}`);
     } else if (ORI === "X") {
@@ -54,47 +54,47 @@ function draw() {
     }
 }
 
+/* 1. CHỈNH SỬA TRỤC TỌA ĐỘ THEO ĐÚNG HÌNH 2 */
 function drawAxis() {
     ctx.lineWidth = 2.5;
     ctx.font = "bold 13px Segoe UI";
 
     let x0 = 50, y0 = 220;
 
-    // Trục X (Đỏ) - Đi sang phải
+    // Trục X (Đỏ) - Nằm ngang hoàn toàn sang phải
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 45, y0 + 26);
+    ctx.lineTo(x0 + 50, y0);
     ctx.stroke();
-    ctx.fillText("X", x0 + 50, y0 + 30);
+    ctx.fillText("X", x0 + 55, y0 + 4);
 
-    // Trục Y (Xanh nước biển) - Đi sang trái
+    // Trục Y (Xanh nước biển) - Chéo lên 45 độ sang phải
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 - 45, y0 + 26);
+    ctx.lineTo(x0 + 35, y0 - 35);
     ctx.stroke();
-    ctx.fillText("Y", x0 - 58, y0 + 30);
+    ctx.fillText("Y", x0 + 40, y0 - 38);
 
-    // Trục Z (Xanh lá cây) - Đi thẳng đứng
+    // Trục Z (Xanh lá cây) - Thẳng đứng lên trên
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0, y0 - 45);
+    ctx.lineTo(x0, y0 - 50);
     ctx.stroke();
-    ctx.fillText("Z", x0 - 4, y0 - 50);
+    ctx.fillText("Z", x0 - 4, y0 - 55);
 }
 
-// SỬA LỖI 1: Chuẩn hóa phép chiếu Isometric bàn tay phải (X sang phải, Y sang trái)
+/* 2. CHUYỂN ĐỔI TỌA ĐỘ 3D SANG 2D ĐỒNG BỘ MỚI (X ngang, Y chéo, Z đứng) */
 function projectISO(x, y, z, cx, cy) {
-    let cos30 = 0.866;
-    let sin30 = 0.5;
+    let kY = 0.7; // Độ nghiêng trục Y
     return {
-        x: cx + (x - y) * cos30,
-        y: cy + (x + y) * sin30 - z
+        x: cx + x + y * kY,
+        y: cy - z - y * kY
     };
 }
 
@@ -121,17 +121,26 @@ function pathLoop(ctx, d1, d2, zLvl, cx, cy, r1, r2, r3, r4) {
     ctx.closePath();
 }
 
+/* 3. TỐI ƯU ĐỒ HỌA 3D VÀ HIỆU ỨNG MẶT ĐẸP MẮT CHO CÁC MẶT XOZ VÀ YOZ */
 function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.8;
     ctx.strokeStyle = "#1e293b";
-    ctx.fillStyle = "rgba(45, 137, 239, 0.2)";
 
-    let offsetX = cx - (d1 - d2) * 0.433;
-    let offsetY = cy - (d1 + d2) * 0.25;
+    let offsetX = cx - d1 / 2;
+    let offsetY = cy + d3 / 2;
 
+    // Đổ bóng màu mượt cho khối 3D
+    let gradTop = ctx.createLinearGradient(0, 0, 0, 200);
+    gradTop.addColorStop(0, "rgba(59, 130, 246, 0.35)");
+    gradTop.addColorStop(1, "rgba(147, 197, 253, 0.15)");
+
+    // Mặt dưới (Đáy)
+    ctx.fillStyle = "rgba(203, 213, 225, 0.3)";
     pathLoop(ctx, d1, d2, 0, offsetX, offsetY, r1, r2, r3, r4);
+    ctx.fill();
     ctx.stroke();
 
+    // Các đường cạnh nối 4 góc
     let bEdge = [
         projectISO(r1, 0, 0, offsetX, offsetY),
         projectISO(d1 - r2, 0, 0, offsetX, offsetY),
@@ -146,28 +155,30 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
         projectISO(r4, d2, d3, offsetX, offsetY)
     ];
 
-    for(let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
         ctx.beginPath();
         ctx.moveTo(bEdge[i].x, bEdge[i].y);
         ctx.lineTo(tEdge[i].x, tEdge[i].y);
         ctx.stroke();
     }
 
+    // Mặt trên (Mặt chính)
+    ctx.fillStyle = gradTop;
     pathLoop(ctx, d1, d2, d3, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
-    // SỬA LỖI 1: Hiển thị đúng nhãn L trên cạnh X (song song đường đỏ)
+    // Hiển thị nhãn kích thước rõ ràng, sắc nét
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 13px Segoe UI";
-    
+
     let c1 = projectISO(d1 / 2, 0, 0, offsetX, offsetY);
-    let c2 = projectISO(0, d2 / 2, 0, offsetX, offsetY);
+    let c2 = projectISO(d1, d2 / 2, 0, offsetX, offsetY);
     let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
 
-    ctx.fillText(lbl1, c1.x + 10, c1.y + 15);
-    ctx.fillText(lbl2, c2.x - 55, c2.y + 15);
-    ctx.fillText(lbl3, c3.x - 55, c3.y - 5);
+    ctx.fillText(lbl1, c1.x - 15, c1.y + 18);
+    ctx.fillText(lbl2, c2.x + 8, c2.y + 4);
+    ctx.fillText(lbl3, c3.x - 55, c3.y + 4);
 }
 
 function log(t) {
