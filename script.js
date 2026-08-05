@@ -36,32 +36,36 @@ function draw() {
     let w = W * scale;
     let h = H * scale;
 
-    let R1 = Math.min(r1 * scale, l / 2, w / 2);
-    let R2 = Math.min(r2 * scale, l / 2, w / 2);
-    let R3 = Math.min(r3 * scale, l / 2, w / 2);
-    let R4 = Math.min(r4 * scale, l / 2, w / 2);
-
-    let cx = c.width / 2 - 40;
+    let cx = c.width / 2 - 20;
     let cy = c.height / 2 + 30;
 
-    // Xoay hướng mặt cắt theo đúng trục tọa độ chuẩn (Hình 2)
     if (ORI === "Z") {
+        let R1 = Math.min(r1 * scale, l / 2, w / 2);
+        let R2 = Math.min(r2 * scale, l / 2, w / 2);
+        let R3 = Math.min(r3 * scale, l / 2, w / 2);
+        let R4 = Math.min(r4 * scale, l / 2, w / 2);
         drawBox3D(cx, cy, l, w, h, R1, R2, R3, R4, `L = ${L}`, `W = ${W}`, `H = ${H}`);
     } else if (ORI === "X") {
-        drawBox3D(cx, cy, h, w, l, R1, R2, R3, R4, `H = ${H}`, `W = ${W}`, `L = ${L}`);
+        let R1 = Math.min(r1 * scale, w / 2, h / 2);
+        let R2 = Math.min(r2 * scale, w / 2, h / 2);
+        let R3 = Math.min(r3 * scale, w / 2, h / 2);
+        let R4 = Math.min(r4 * scale, w / 2, h / 2);
+        drawBox3D(cx, cy, w, h, l, R1, R2, R3, R4, `W = ${W}`, `H = ${H}`, `L = ${L}`);
     } else if (ORI === "Y") {
+        let R1 = Math.min(r1 * scale, l / 2, h / 2);
+        let R2 = Math.min(r2 * scale, l / 2, h / 2);
+        let R3 = Math.min(r3 * scale, l / 2, h / 2);
+        let R4 = Math.min(r4 * scale, l / 2, h / 2);
         drawBox3D(cx, cy, l, h, w, R1, R2, R3, R4, `L = ${L}`, `H = ${H}`, `W = ${W}`);
     }
 }
 
-/* 1. SỬA TRỤC TỌA ĐỘ CHUẨN THEO HÌNH 2 */
 function drawAxis() {
     ctx.lineWidth = 2.5;
     ctx.font = "bold 13px Segoe UI";
 
     let x0 = 50, y0 = 220;
 
-    // Trục X (Đỏ) - Nằm ngang sang phải
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
@@ -70,7 +74,6 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("X", x0 + 55, y0 + 4);
 
-    // Trục Y (Xanh dương) - Nghiêng 45 độ sang phải
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
@@ -79,7 +82,6 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("Y", x0 + 40, y0 - 38);
 
-    // Trục Z (Xanh lá) - Thẳng đứng lên trên
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
@@ -89,9 +91,8 @@ function drawAxis() {
     ctx.fillText("Z", x0 - 4, y0 - 55);
 }
 
-/* 2. CHUYỂN ĐỔI TỌA ĐỘ ISO ĐỒNG BỘ TRỤC TỌA ĐỘ CHUẨN */
 function projectISO(x, y, z, cx, cy) {
-    let kY = 0.6; // Hệ số nghiêng góc của trục Y
+    let kY = 0.55;
     return {
         x: cx + x + y * kY,
         y: cy - z - y * kY
@@ -121,26 +122,21 @@ function pathLoop(ctx, d1, d2, zLvl, cx, cy, r1, r2, r3, r4) {
     ctx.closePath();
 }
 
-/* 3. TỐI ƯU ĐỒ HỌA VÀ ĐỔ BÓNG CHO MẶT XOZ VÀ YOZ ĐẸP MẮT */
 function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     ctx.lineWidth = 1.8;
-    ctx.strokeStyle = "#1e293b";
-
     let offsetX = cx - d1 / 2;
     let offsetY = cy + d3 / 2;
 
-    // Gradient đổ bóng mặt trên cho hiệu ứng 3D rõ nét
-    let gradTop = ctx.createLinearGradient(0, 0, 0, 200);
-    gradTop.addColorStop(0, "rgba(59, 130, 246, 0.4)");
-    gradTop.addColorStop(1, "rgba(147, 197, 253, 0.2)");
+    let gradTop = ctx.createLinearGradient(0, 0, 0, 250);
+    gradTop.addColorStop(0, "rgba(59, 130, 246, 0.35)");
+    gradTop.addColorStop(1, "rgba(147, 197, 253, 0.15)");
 
-    // Vẽ & tô mặt đáy
-    ctx.fillStyle = "rgba(226, 232, 240, 0.4)";
+    ctx.strokeStyle = "#94a3b8";
+    ctx.fillStyle = "rgba(241, 245, 249, 0.4)";
     pathLoop(ctx, d1, d2, 0, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
-    // Các đường đứng nối góc
     let bEdge = [
         projectISO(r1, 0, 0, offsetX, offsetY),
         projectISO(d1 - r2, 0, 0, offsetX, offsetY),
@@ -155,6 +151,7 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
         projectISO(r4, d2, d3, offsetX, offsetY)
     ];
 
+    ctx.strokeStyle = "#334155";
     for (let i = 0; i < 4; i++) {
         ctx.beginPath();
         ctx.moveTo(bEdge[i].x, bEdge[i].y);
@@ -162,23 +159,22 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
         ctx.stroke();
     }
 
-    // Vẽ & tô mặt đỉnh
+    ctx.strokeStyle = "#1e293b";
     ctx.fillStyle = gradTop;
     pathLoop(ctx, d1, d2, d3, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
-    // Hiển thị kích thước đẹp mắt, không chèn lên cạnh hình
     ctx.fillStyle = "#0f172a";
-    ctx.font = "bold 13px Segoe UI";
+    ctx.font = "bold 12px Segoe UI";
 
     let c1 = projectISO(d1 / 2, 0, 0, offsetX, offsetY);
     let c2 = projectISO(d1, d2 / 2, 0, offsetX, offsetY);
     let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
 
-    ctx.fillText(lbl1, c1.x - 15, c1.y + 18);
-    ctx.fillText(lbl2, c2.x + 10, c2.y + 4);
-    ctx.fillText(lbl3, c3.x - 55, c3.y + 4);
+    ctx.fillText(lbl1, c1.x - 18, c1.y + 18);
+    ctx.fillText(lbl2, c2.x + 8, c2.y + 4);
+    ctx.fillText(lbl3, c3.x - 58, c3.y + 4);
 }
 
 function log(t) {
@@ -303,11 +299,20 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
+    let oriString = "ORI Y is Y and Z is Z";
+    if (ORI === "X") {
+        oriString = "ORI Y is Y and Z is X";[cite: 1]
+    } else if (ORI === "Y") {
+        oriString = "ORI Y is -X and Z is Y";[cite: 2]
+    } else if (ORI === "Z") {
+        oriString = "ORI Y is Y and Z is Z";[cite: 3]
+    }
+
     let data = `NEW EQUIPMENT
 USRCOG ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 USRWCO ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 POS X ${px}mm Y ${py}mm Z ${pz}mm
-ORI Y is -X and Z is Y
+${oriString}
 BUIL false
 DSCO unset
 PTSP unset
@@ -346,7 +351,7 @@ END`;
     let blob = new Blob([data], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "Opening.mac";
+    a.download = `Opening_${ORI}.mac`;
     a.click();
 }
 
