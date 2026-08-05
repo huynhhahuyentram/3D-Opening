@@ -3,88 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Opening & Cut Zone Tool</title>
+    <title>3D Real-time Macro Generator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="app">
-    <!-- Màn hình Canvas 3D -->
-    <canvas id="view"></canvas>
-
-    <div class="panel">
-        <!-- Bảng 2 Cột: Position & Dimension -->
-        <div class="row">
-            <div class="box">
-                <h3>Position</h3>
-                <div class="input-list">
-                    <div class="input-item">
-                        <label>X [mm]</label>
-                        <input id="px" type="number" value="0">
-                    </div>
-                    <div class="input-item">
-                        <label>Y [mm]</label>
-                        <input id="py" type="number" value="0">
-                    </div>
-                    <div class="input-item">
-                        <label>Z [mm]</label>
-                        <input id="pz" type="number" value="0">
-                    </div>
-                </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>THÔNG SỐ LỖ MỞ</h2>
+            
+            <div class="section-title">Vị trí (Position)</div>
+            <div class="input-group">
+                <label>POS X:</label>
+                <input type="number" id="px" value="51000">
+                <label>Y:</label>
+                <input type="number" id="py" value="-9747.5">
+                <label>Z:</label>
+                <input type="number" id="pz" value="8725">
             </div>
 
-            <div class="box">
-                <h3>Dimension</h3>
-                <div class="input-list">
-                    <div class="input-item">
-                        <label>Length [mm]</label>
-                        <input id="dx" type="number" value="0">
-                    </div>
-                    <div class="input-item">
-                        <label>Width [mm]</label>
-                        <input id="dy" type="number" value="0">
-                    </div>
-                    <div class="input-item">
-                        <label>Height [mm]</label>
-                        <input id="dz" type="number" value="0">
-                    </div>
-                </div>
+            <div class="section-title">Kích thước (Dimensions)</div>
+            <div class="input-group">
+                <label>Dài (L):</label>
+                <input type="number" id="dx" value="2000">
             </div>
-        </div>
-
-        <!-- Bo góc -->
-        <div class="box">
-            <h3>Corner Radius (mm)</h3>
-            <div class="radius">
-                <label>R1<input id="r1" type="number" value="150"></label>
-                <label>R2<input id="r2" type="number" value="150"></label>
-                <label>R3<input id="r3" type="number" value="150"></label>
-                <label>R4<input id="r4" type="number" value="150"></label>
+            <div class="input-group">
+                <label>Rộng (W):</label>
+                <input type="number" id="dy" value="1000">
             </div>
-        </div>
+            <div class="input-group">
+                <label>Cao (H):</label>
+                <input type="number" id="dz" value="300">
+            </div>
 
-        <!-- Orientation -->
-        <div class="box">
-            <h3>Orientation</h3>
+            <div class="section-title">Bán kính bo góc (Radius)</div>
+            <div class="input-group gap">
+                <input type="number" id="r1" value="150" placeholder="R1">
+                <input type="number" id="r2" value="150" placeholder="R2">
+                <input type="number" id="r3" value="150" placeholder="R3">
+                <input type="number" id="r4" value="150" placeholder="R4">
+            </div>
+
+            <div class="section-title">Định hướng (Orientation)</div>
             <div class="ori">
-                <button onclick="setOri('X')" id="ox">X</button>
-                <button onclick="setOri('Y')" id="oy">Y</button>
-                <button onclick="setOri('Z')" id="oz" class="active">Z</button>
+                <button id="ox" onclick="setOri('X')">X (YOZ)</button>
+                <button id="oy" onclick="setOri('Y')">Y (XOZ)</button>
+                <button id="oz" class="active" onclick="setOri('Z')">Z (XOY)</button>
+            </div>
+
+            <div class="actions">
+                <button class="btn-voice" onclick="voice()">🎤 Giọng nói</button>
+                <button class="btn-save" onclick="saveFile()">💾 Xuất File .MAC</button>
+                <button class="btn-reset" onclick="reset()">🔄 Đặt lại</button>
+                <button class="btn-help" onclick="help()">❓ Trợ giúp</button>
             </div>
         </div>
 
-        <!-- Nút bấm chức năng -->
-        <div class="btns">
-            <button class="ok" onclick="saveFile()">OK (Export MAC)</button>
-            <button class="voice" onclick="voice()">🎤 Voice</button>
-            <button class="help" onclick="help()">Help</button>
-            <button class="reset" onclick="reset()">Reset</button>
+        <div class="main-content">
+            <div class="canvas-container">
+                <canvas id="view"></canvas>
+            </div>
+            <div class="chat-container" id="chat">
+                <div>🤖 Hệ thống đã sẵn sàng. Vui lòng nhập thông số hoặc bấm micro!</div>
+            </div>
         </div>
-
-        <div id="chat"></div>
     </div>
-</div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
