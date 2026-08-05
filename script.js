@@ -24,39 +24,26 @@ function draw() {
 
     if (L === 0 && W === 0 && H === 0) return;
 
-    // Xác định 2 chiều d1, d2 và nhãn kích thước tương ứng theo từng mặt phẳng ORI
-    let d1 = 0, d2 = 0;
-    let lbl1 = "", lbl2 = "";
+    let maxDim = Math.max(L, W, H, 100);
+    let scale = 110 / maxDim;
+
+    let l = L * scale;
+    let w = W * scale;
+    let h = H * scale;
+
+    let cx = c.width / 2 - 20;
+    let cy = c.height / 2 + 30;
 
     if (ORI === "Z") {
-        d1 = L; d2 = W;
-        lbl1 = `L = ${L}`; lbl2 = `W = ${W}`;
+        drawBox3DSharp(cx, cy, l, w, h, `L=${L}`, `W=${W}`, `H=${H}`);
     } else if (ORI === "X") {
-        d1 = W; d2 = H;
-        lbl1 = `W = ${W}`; lbl2 = `H = ${H}`;
+        drawBox3DSharp(cx, cy, w, h, l, `W=${W}`, `H=${H}`, `L=${L}`);
     } else if (ORI === "Y") {
-        d1 = L; d2 = H;
-        lbl1 = `L = ${L}`; lbl2 = `H = ${H}`;
+        drawBox3DSharp(cx, cy, l, h, w, `L=${L}`, `H=${H}`, `W=${W}`);
     }
-
-    if (d1 === 0 || d2 === 0) return;
-
-    // Tự động Scale theo khung Canvas 2D
-    let maxDrawWidth = c.width - 240;
-    let maxDrawHeight = c.height - 100;
-
-    let scale = Math.min(maxDrawWidth / d1, maxDrawHeight / d2);
-
-    let w = d1 * scale;
-    let h = d2 * scale;
-
-    let cx = c.width / 2 - w / 2 + 20;
-    let cy = c.height / 2 + h / 2;
-
-    drawBox2D(cx, cy, w, h, lbl1, lbl2);
 }
 
-/* 1. TRỤC TỌA ĐỘ CHUẨN (GÓC TRÁI) */
+/* 1. TRỤC TỌA ĐỘ CHUẨN */
 function drawAxis() {
     ctx.lineWidth = 2.5;
     ctx.font = "bold 13px Segoe UI";
@@ -91,32 +78,78 @@ function drawAxis() {
     ctx.fillText("Z", x0 - 4, y0 - 55);
 }
 
-/* 2. VẼ 2D KHÔNG BO GÓC CHUẨN PHẲNG */
-function drawBox2D(x, y, w, h, lbl1, lbl2) {
-    let topY = y - h;
+/* 2. CHUYỂN ĐỔI TỌA ĐỘ ISOMETRIC CHUẨN */
+function projectISO(x, y, z, cx, cy) {
+    let kY = 0.55; 
+    return {
+        x: cx + x + y * kY,
+        y: cy - z - y * kY
+    };
+}
 
-    // Tô màu nền phẳng & vẽ khung viền
-    ctx.fillStyle = "rgba(59, 130, 246, 0.15)";
-    ctx.strokeStyle = "#1e293b";
-    ctx.lineWidth = 2;
+/* 3. VẼ HÌNH HỘP CHỮ NHẬT 3D PHẲNG KHÔNG BO GÓC (THEO HÌNH 2) */
+function drawBox3DSharp(cx, cy, d1, d2, d3, lbl1, lbl2, lbl3) {
+    ctx.lineWidth = 1.8;
+    let offsetX = cx - d1 / 2;
+    let offsetY = cy + d3 / 2;
 
-    ctx.fillRect(x, topY, w, h);
-    ctx.strokeRect(x, topY, w, h);
+    // Tọa độ 4 đỉnh mặt đáy (z = 0)
+    let b0 = projectISO(0, 0, 0, offsetX, offsetY);
+    let b1 = projectISO(d1, 0, 0, offsetX, offsetY);
+    let b2 = projectISO(d1, d2, 0, offsetX, offsetY);
+    let b3 = projectISO(0, d2, 0, offsetX, offsetY);
 
-    // Ký hiệu thông số kích thước
-    ctx.fillStyle = "#0f172a";
+    // Tọa độ 4 đỉnh mặt đỉnh (z = d3)
+    let t0 = projectISO(0, 0, d3, offsetX, offsetY);
+    let t1 = projectISO(d1, 0, d3, offsetX, offsetY);
+    let t2 = projectISO(d1, d2, d3, offsetX, offsetY);
+    let t3 = projectISO(0, d2, d3, offsetX, offsetY);
+
+    // Dynamic stroke style & Color
+    ctx.strokeStyle = "#0000ff";
+    ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
+
+    // 1. Vẽ mặt phẳng đáy
+    ctx.beginPath();
+    ctx.moveTo(b0.x, b0.y);
+    ctx.lineTo(b1.x, b1.y);
+    ctx.lineTo(b2.x, b2.y);
+    ctx.lineTo(b3.x, b3.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+
+    // 2. Vẽ 4 cạnh dọc thẳng đứng nối đáy và đỉnh
+    let bEdges = [b0, b1, b2, b3];
+    let tEdges = [t0, t1, t2, t3];
+    for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(bEdges[i].x, bEdges[i].y);
+        ctx.lineTo(tEdges[i].x, tEdges[i].y);
+        ctx.stroke();
+    }
+
+    // 3. Vẽ mặt phẳng đỉnh
+    ctx.beginPath();
+    ctx.moveTo(t0.x, t0.y);
+    ctx.lineTo(t1.x, t1.y);
+    ctx.lineTo(t2.x, t2.y);
+    ctx.lineTo(t3.x, t3.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+
+    // 4. Hiển thị thông số kích thước (L, W, H)
+    ctx.fillStyle = "#1e293b";
     ctx.font = "bold 13px Segoe UI";
-    ctx.textAlign = "center";
 
-    // Nhãn ngang (Đáy)
-    ctx.fillText(lbl1, x + w / 2, y + 22);
+    let c1 = projectISO(d1 / 2, 0, 0, offsetX, offsetY);
+    let c2 = projectISO(d1, d2 / 2, d3, offsetX, offsetY);
+    let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
 
-    // Nhãn dọc (Bên phải)
-    ctx.textAlign = "left";
-    ctx.fillText(lbl2, x + w + 12, topY + h / 2 + 4);
-
-    // Reset căn lề chữ mặc định
-    ctx.textAlign = "start";
+    ctx.fillText(lbl1, c1.x - 20, c1.y + 18);
+    ctx.fillText(lbl2, c2.x - 15, c2.y - 8);
+    ctx.fillText(lbl3, c3.x - 55, c3.y + 4);
 }
 
 function log(t) {
@@ -227,7 +260,7 @@ function speak(t) {
     window.speechSynthesis.speak(u);
 }
 
-/* 3. FIX LỖI ORI KHI XUẤT FILE .MAC */
+/* 4. CHỈNH SỬA CHUẨN ORI KHI XUẤT FILE .MAC THEO ĐÚNG HƯỚNG ĐƯỢC CHỌN */
 function saveFile() {
     let px = +document.getElementById("px").value || 0;
     let py = +document.getElementById("py").value || 0;
@@ -242,28 +275,28 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
-    // Xác định chuẩn chuỗi ORI Exntrusion theo đúng yêu cầu
-    let oriExtrusionStr = "ORI Y is Y and Z is Z";
+    // Xác định chính xác chuỗi ORI theo biến ORI đang được chọn
+    let oriStr = "ORI Y is Y and Z is Z";
     if (ORI === "X") {
-        oriExtrusionStr = "ORI Y is Y and Z is X";
+        oriStr = "ORI Y is Y and Z is X";
     } else if (ORI === "Y") {
-        oriExtrusionStr = "ORI Y is -X and Z is Y";
+        oriStr = "ORI Y is -X and Z is Y";
     } else if (ORI === "Z") {
-        oriExtrusionStr = "ORI Y is Y and Z is Z";
+        oriStr = "ORI Y is Y and Z is Z";
     }
 
     let data = `NEW EQUIPMENT
 USRCOG ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 USRWCO ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 POS X ${px}mm Y ${py}mm Z ${pz}mm
-ORI Y is -X and Z is Y
+${oriStr}
 BUIL false
 DSCO unset
 PTSP unset
 INSC unset
 
 NEW EXTRUSION
-${oriExtrusionStr}
+${oriStr}
 LEVE 0 2
 HEIG ${H}mm
 
