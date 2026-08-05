@@ -4,7 +4,7 @@ const ctx = c.getContext("2d");
 let ORI = "Z";
 
 function setOri(o) {
-    ORI = o.toUpperCase(); // Đồng bộ biến ORI luôn là chữ viết hoa (X, Y, Z)
+    ORI = o;
     document.querySelectorAll(".ori button").forEach(b => b.classList.remove("active"));
     document.getElementById("o" + o.toLowerCase()).classList.add("active");
     draw();
@@ -311,23 +311,11 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
-    // Ép kiểu chuỗi để tránh lỗi chữ hoa / chữ thường khi kiểm tra
-    let currentOri = (ORI || "").toUpperCase();
-    let oriString = "ORI Y is Y and Z is Z";
-
-    if (currentOri === "X") {
-        oriString = "ORI Y is Y and Z is X";[cite: 1]
-    } else if (currentOri === "Y") {
-        oriString = "ORI Y is -X and Z is Y";[cite: 2]
-    } else if (currentOri === "Z") {
-        oriString = "ORI Y is Y and Z is Z";[cite: 3]
-    }
-
     let data = `NEW EQUIPMENT
 USRCOG ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 USRWCO ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 POS X ${px}mm Y ${py}mm Z ${pz}mm
-${oriString}
+ORI Y is -X and Z is Y
 BUIL false
 DSCO unset
 PTSP unset
