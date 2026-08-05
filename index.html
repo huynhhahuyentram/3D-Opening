@@ -13,23 +13,41 @@
     <canvas id="view"></canvas>
 
     <div class="panel">
-        <!-- Bảng 2 cột: Position và Dimension -->
+        <!-- Bảng 2 Cột: Position & Dimension -->
         <div class="row">
             <div class="box">
-                <h3>Position (mm)</h3>
-                <div class="input-grid">
-                    <label>X <input id="px" type="number" value="0"></label>
-                    <label>Y <input id="py" type="number" value="0"></label>
-                    <label>Z <input id="pz" type="number" value="0"></label>
+                <h3>Position</h3>
+                <div class="input-list">
+                    <div class="input-item">
+                        <label>X [mm]</label>
+                        <input id="px" type="number" value="0">
+                    </div>
+                    <div class="input-item">
+                        <label>Y [mm]</label>
+                        <input id="py" type="number" value="0">
+                    </div>
+                    <div class="input-item">
+                        <label>Z [mm]</label>
+                        <input id="pz" type="number" value="0">
+                    </div>
                 </div>
             </div>
 
             <div class="box">
-                <h3>Dimension (mm)</h3>
-                <div class="input-grid">
-                    <label>Length [mm] <input id="dx" type="number" value="0"></label>
-                    <label>Width [mm] <input id="dy" type="number" value="0"></label>
-                    <label>Height [mm] <input id="dz" type="number" value="0"></label>
+                <h3>Dimension</h3>
+                <div class="input-list">
+                    <div class="input-item">
+                        <label>Length [mm]</label>
+                        <input id="dx" type="number" value="0">
+                    </div>
+                    <div class="input-item">
+                        <label>Width [mm]</label>
+                        <input id="dy" type="number" value="0">
+                    </div>
+                    <div class="input-item">
+                        <label>Height [mm]</label>
+                        <input id="dz" type="number" value="0">
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,7 +63,7 @@
             </div>
         </div>
 
-        <!-- Orientation: Mặt phẳng vuông góc với trục -->
+        <!-- Orientation -->
         <div class="box">
             <h3>Orientation</h3>
             <div class="ori">
