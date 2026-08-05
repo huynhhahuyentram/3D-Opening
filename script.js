@@ -311,7 +311,7 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
-    // Cập nhật chuỗi ORI động theo giá trị biến ORI hiện tại
+    // Định hướng ORI chính xác theo ảnh tham chiếu
     let oriString = "ORI Y is Y and Z is Z";
     if (ORI === "X") {
         oriString = "ORI Y is Y and Z is X";[cite: 1]
