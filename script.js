@@ -39,6 +39,7 @@ function draw() {
     let cx = c.width / 2 - 20;
     let cy = c.height / 2 + 30;
 
+    // Xử lý đồ họa chuẩn xác theo từng hướng ORI
     if (ORI === "Z") {
         let R1 = Math.min(r1 * scale, l / 2, w / 2);
         let R2 = Math.min(r2 * scale, l / 2, w / 2);
@@ -60,12 +61,14 @@ function draw() {
     }
 }
 
+/* 1. TRỤC TỌA ĐỘ CHUẨN Theo HÌNH 2 */
 function drawAxis() {
     ctx.lineWidth = 2.5;
     ctx.font = "bold 13px Segoe UI";
 
     let x0 = 50, y0 = 220;
 
+    // Trục X (Đỏ) - Nằm ngang sang phải
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
@@ -74,6 +77,7 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("X", x0 + 55, y0 + 4);
 
+    // Trục Y (Xanh dương) - Nghiêng 45 độ sang phải
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
@@ -82,6 +86,7 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("Y", x0 + 40, y0 - 38);
 
+    // Trục Z (Xanh lá) - Thẳng đứng lên trên
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
@@ -91,8 +96,9 @@ function drawAxis() {
     ctx.fillText("Z", x0 - 4, y0 - 55);
 }
 
+/* 2. CHUYỂN ĐỔI TỌA ĐỘ ISOMETRIC CHUẨN */
 function projectISO(x, y, z, cx, cy) {
-    let kY = 0.55;
+    let kY = 0.55; // Độ nghiêng tự nhiên của chiều sâu
     return {
         x: cx + x + y * kY,
         y: cy - z - y * kY
@@ -122,21 +128,25 @@ function pathLoop(ctx, d1, d2, zLvl, cx, cy, r1, r2, r3, r4) {
     ctx.closePath();
 }
 
+/* 3. TỐI ƯU HÌNH DẠNG VÀ TÔ MẦU 3D CHUYÊN NGHIỆP */
 function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     ctx.lineWidth = 1.8;
     let offsetX = cx - d1 / 2;
     let offsetY = cy + d3 / 2;
 
+    // Gradient màu phủ bề mặt đẹp mắt
     let gradTop = ctx.createLinearGradient(0, 0, 0, 250);
     gradTop.addColorStop(0, "rgba(59, 130, 246, 0.35)");
     gradTop.addColorStop(1, "rgba(147, 197, 253, 0.15)");
 
+    // Vẽ mặt đáy (màu xám nhẹ)
     ctx.strokeStyle = "#94a3b8";
     ctx.fillStyle = "rgba(241, 245, 249, 0.4)";
     pathLoop(ctx, d1, d2, 0, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
+    // Các đường gân dọc nối 2 mặt
     let bEdge = [
         projectISO(r1, 0, 0, offsetX, offsetY),
         projectISO(d1 - r2, 0, 0, offsetX, offsetY),
@@ -159,12 +169,14 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
         ctx.stroke();
     }
 
+    // Vẽ mặt đỉnh (mặt chính nổi bật)
     ctx.strokeStyle = "#1e293b";
     ctx.fillStyle = gradTop;
     pathLoop(ctx, d1, d2, d3, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
+    // Hiển thị nhãn kích thước rõ nét, căn vị trí tránh che nét vẽ
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 12px Segoe UI";
 
@@ -285,7 +297,6 @@ function speak(t) {
     window.speechSynthesis.speak(u);
 }
 
-/* ĐÃ ĐIỀU CHỈNH: ÁNH XẠ BIẾN ORI SANG CHUỖI CÚ PHÁP TƯƠNG ỨNG VỚI AH_X, AH_Y, AH_Z */
 function saveFile() {
     let px = +document.getElementById("px").value || 0;
     let py = +document.getElementById("py").value || 0;
@@ -300,20 +311,11 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
-    let oriString = "ORI Y is -X and Z is Y"; // Mặc định cho Y
-    if (ORI === "X") {
-        oriString = "ORI Y is Y and Z is X";[cite: 1]
-    } else if (ORI === "Y") {
-        oriString = "ORI Y is -X and Z is Y";[cite: 2]
-    } else if (ORI === "Z") {
-        oriString = "ORI Y is Y and Z is Z";[cite: 3]
-    }
-
     let data = `NEW EQUIPMENT
 USRCOG ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 USRWCO ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 POS X ${px}mm Y ${py}mm Z ${pz}mm
-${oriString}
+ORI Y is -X and Z is Y
 BUIL false
 DSCO unset
 PTSP unset
@@ -352,7 +354,7 @@ END`;
     let blob = new Blob([data], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `Opening_${ORI}.mac`;
+    a.download = "Opening.mac";
     a.click();
 }
 
