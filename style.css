@@ -85,13 +85,16 @@ h3 {
     transition: all 0.2s ease-in-out;
 }
 
+/* SỬA LỖI 2: TẮT MŨI TÊN TĂNG GIẢM SỐ TRÊN MỌI TRÌNH DUYỆT (CHROME, SAFARI, EDGE, FIREFOX) */
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
+    -webkit-appearance: none !important; 
+    margin: 0 !important; 
 }
+
 input[type=number] {
-    -moz-appearance: textfield;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
 }
 
 .input-item input:focus {
