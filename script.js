@@ -311,11 +311,21 @@ function saveFile() {
     let r3 = document.getElementById("r3").value || 0;
     let r4 = document.getElementById("r4").value || 0;
 
+    // Cập nhật chuỗi ORI động theo giá trị biến ORI hiện tại
+    let oriString = "ORI Y is Y and Z is Z";
+    if (ORI === "X") {
+        oriString = "ORI Y is Y and Z is X";[cite: 1]
+    } else if (ORI === "Y") {
+        oriString = "ORI Y is -X and Z is Y";[cite: 2]
+    } else if (ORI === "Z") {
+        oriString = "ORI Y is Y and Z is Z";[cite: 3]
+    }
+
     let data = `NEW EQUIPMENT
 USRCOG ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 USRWCO ( X ( 0 ) Y ( 0 ) Z ( 0 ) )
 POS X ${px}mm Y ${py}mm Z ${pz}mm
-ORI Y is -X and Z is Y
+${oriString}
 BUIL false
 DSCO unset
 PTSP unset
