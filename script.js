@@ -11,9 +11,8 @@ function setOri(o) {
     draw();
 }
 
-/* HÀM VẼ TỔNG HỢP REAL-TIME */
+/* HÀM VẼ TỔNG HỢP REAL-TIME HÌNH 3D BO GÓC */
 function draw() {
-    // Tự động điều chỉnh kích thước Canvas theo màn hình
     c.width = c.offsetWidth;
     c.height = 280;
 
@@ -21,15 +20,17 @@ function draw() {
     let W = +document.getElementById("dy").value || 0;
     let H = +document.getElementById("dz").value || 0;
 
+    let r1 = +document.getElementById("r1").value || 0;
+    let r2 = +document.getElementById("r2").value || 0;
+    let r3 = +document.getElementById("r3").value || 0;
+    let r4 = +document.getElementById("r4").value || 0;
+
     ctx.clearRect(0, 0, c.width, c.height);
 
-    // Vẽ Trục tọa độ theo quy tắc bàn tay phải
     drawAxis();
 
-    // Nếu kích thước = 0 thì không vẽ khối 3D
     if (L === 0 && W === 0 && H === 0) return;
 
-    // Tính toán Tỷ lệ (Scale Auto)
     let maxDim = Math.max(L, W, H, 100);
     let scale = 110 / maxDim;
 
@@ -37,31 +38,31 @@ function draw() {
     let w = W * scale;
     let h = H * scale;
 
-    // Tọa độ tâm khối 3D trên màn hình
+    let R1 = Math.min(r1 * scale, l / 2, w / 2);
+    let R2 = Math.min(r2 * scale, l / 2, w / 2);
+    let R3 = Math.min(r3 * scale, l / 2, w / 2);
+    let R4 = Math.min(r4 * scale, l / 2, w / 2);
+
     let cx = c.width / 2;
     let cy = c.height / 2 + 10;
 
-    // Phân chiếu hình học 3D Iso chuẩn theo Orientation
     if (ORI === "Z") {
-        // Mặt phẳng L x W nằm trên XY, Đùn H theo Z
-        drawIsometricBox(cx, cy, l, w, h, "L = " + L, "W = " + W, "H = " + H);
+        drawRoundedBox(cx, cy, l, w, h, R1, R2, R3, R4, "L = " + L, "W = " + W, "H = " + H);
     } else if (ORI === "X") {
-        // Mặt phẳng W x H nằm trên YZ, Đùn L theo X
-        drawIsometricBox(cx, cy, w, h, l, "W = " + W, "H = " + H, "L = " + L);
+        drawRoundedBox(cx, cy, w, h, l, R1, R2, R3, R4, "W = " + W, "H = " + H, "L = " + L);
     } else if (ORI === "Y") {
-        // Mặt phẳng L x H nằm trên XZ, Đùn W theo Y
-        drawIsometricBox(cx, cy, l, h, w, "L = " + L, "H = " + H, "W = " + W);
+        drawRoundedBox(cx, cy, l, h, w, R1, R2, R3, R4, "L = " + L, "H = " + H, "W = " + W);
     }
 }
 
-/* TRỤC TỌA ĐỘ THEO QUY TẮC BÀN TAY PHẢI */
+/* TRỤC TỌA ĐỘ BÀN TAY PHẢI */
 function drawAxis() {
     ctx.lineWidth = 2.5;
     ctx.font = "bold 14px Segoe UI";
 
     let x0 = 50, y0 = 220;
 
-    // Trục X (Đỏ) - Hướng sang phải
+    // Trục X (Đỏ)
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
@@ -70,7 +71,7 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("X", x0 + 55, y0 + 5);
 
-    // Trục Y (Xanh nước biển) - Hướng chéo lên
+    // Trục Y (Xanh nước biển)
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
@@ -79,7 +80,7 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("Y", x0 + 40, y0 - 32);
 
-    // Trục Z (Xanh lá cây) - Hướng thẳng đứng
+    // Trục Z (Xanh lá cây)
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
@@ -89,59 +90,101 @@ function drawAxis() {
     ctx.fillText("Z", x0 - 5, y0 - 55);
 }
 
-/* KHỐI 3D ISOMETRIC CHUẨN KHÔNG BỊ TRỒNG NÉT CỮ */
-function drawIsometricBox(cx, cy, d1, d2, d3, label1, label2, label3) {
-    ctx.strokeStyle = "#2c3e50";
-    ctx.lineWidth = 2;
-    ctx.fillStyle = "#2c3e50";
-    ctx.font = "bold 13px Segoe UI";
-
-    // Chiếu Isometric
+/* BIẾN ĐỔI ISO */
+function isoProj(x, y, z, cx, cy) {
     let cos30 = 0.866;
     let sin30 = 0.5;
+    return {
+        x: cx + (x - y) * cos30,
+        y: cy + (x + y) * sin30 - z
+    };
+}
 
-    // Tọa độ 8 đỉnh khối hộp 3D
-    let p0 = { x: cx - (d1 * cos30 - d2 * cos30)/2, y: cy + (d1 * sin30 + d2 * sin30)/2 };
-    let p1 = { x: p0.x + d1 * cos30, y: p0.y - d1 * sin30 };
-    let p2 = { x: p1.x - d2 * cos30, y: p1.y - d2 * sin30 };
-    let p3 = { x: p0.x - d2 * cos30, y: p0.y - d2 * sin30 };
+/* TẠO ĐƯỜNG DẪN MẶT ĐÁY VỚI 4 GÓC BO CORNER RADIUS */
+function buildRoundedPath(ctx, d1, d2, zLevel, cx, cy, r1, r2, r3, r4) {
+    let p0 = isoProj(0, 0, zLevel, cx, cy);
+    let p1 = isoProj(d1, 0, zLevel, cx, cy);
+    let p2 = isoProj(d1, d2, zLevel, cx, cy);
+    let p3 = isoProj(0, d2, zLevel, cx, cy);
 
-    let p0_top = { x: p0.x, y: p0.y - d3 };
-    let p1_top = { x: p1.x, y: p1.y - d3 };
-    let p2_top = { x: p2.x, y: p2.y - d3 };
-    let p3_top = { x: p3.x, y: p3.y - d3 };
-
-    // Vẽ Mặt trên
     ctx.beginPath();
-    ctx.moveTo(p0_top.x, p0_top.y);
-    ctx.lineTo(p1_top.x, p1_top.y);
-    ctx.lineTo(p2_top.x, p2_top.y);
-    ctx.lineTo(p3_top.x, p3_top.y);
+    
+    // Góc R1 (0,0)
+    let p0_a = isoProj(r1, 0, zLevel, cx, cy);
+    let p0_b = isoProj(0, r1, zLevel, cx, cy);
+    ctx.moveTo(p0_a.x, p0_a.y);
+
+    // Đến Góc R2 (d1,0)
+    let p1_a = isoProj(d1 - r2, 0, zLevel, cx, cy);
+    let p1_b = isoProj(d1, r2, zLevel, cx, cy);
+    ctx.lineTo(p1_a.x, p1_a.y);
+    ctx.quadraticCurveTo(p1.x, p1.y, p1_b.x, p1_b.y);
+
+    // Đến Góc R3 (d1,d2)
+    let p2_a = isoProj(d1, d2 - r3, zLevel, cx, cy);
+    let p2_b = isoProj(d1 - r3, d2, zLevel, cx, cy);
+    ctx.lineTo(p2_a.x, p2_a.y);
+    ctx.quadraticCurveTo(p2.x, p2.y, p2_b.x, p2_b.y);
+
+    // Đến Góc R4 (0,d2)
+    let p3_a = isoProj(r4, d2, zLevel, cx, cy);
+    let p3_b = isoProj(0, d2 - r4, zLevel, cx, cy);
+    ctx.lineTo(p3_a.x, p3_a.y);
+    ctx.quadraticCurveTo(p3.x, p3.y, p3_b.x, p3_b.y);
+
+    // Về Góc R1
+    ctx.lineTo(p0_b.x, p0_b.y);
+    ctx.quadraticCurveTo(p0.x, p0.y, p0_a.x, p0_a.y);
     ctx.closePath();
+}
+
+/* VẼ KHỐI 3D CHÂN THỰC VỚI BO GÓC */
+function drawRoundedBox(cx, cy, d1, d2, d3, r1, r2, r3, r4, label1, label2, label3) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#1e293b";
+    ctx.fillStyle = "rgba(45, 137, 239, 0.15)";
+
+    // Vẽ & Tô bóng mặt dưới
+    buildRoundedPath(ctx, d1, d2, 0, cx - d1/3, cy - 20, r1, r2, r3, r4);
     ctx.stroke();
 
-    // Vẽ Mặt trước trái
-    ctx.beginPath();
-    ctx.moveTo(p0.x, p0.y);
-    ctx.lineTo(p1.x, p1.y);
-    ctx.lineTo(p1_top.x, p1_top.y);
-    ctx.lineTo(p0_top.x, p0_top.y);
-    ctx.closePath();
+    // Vẽ các đường dựng đứng 4 góc bo
+    let ptsBottom = [
+        isoProj(r1, 0, 0, cx - d1/3, cy - 20),
+        isoProj(d1 - r2, 0, 0, cx - d1/3, cy - 20),
+        isoProj(d1, d2 - r3, 0, cx - d1/3, cy - 20),
+        isoProj(r4, d2, 0, cx - d1/3, cy - 20)
+    ];
+
+    let ptsTop = [
+        isoProj(r1, 0, d3, cx - d1/3, cy - 20),
+        isoProj(d1 - r2, 0, d3, cx - d1/3, cy - 20),
+        isoProj(d1, d2 - r3, d3, cx - d1/3, cy - 20),
+        isoProj(r4, d2, d3, cx - d1/3, cy - 20)
+    ];
+
+    for(let i=0; i<4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(ptsBottom[i].x, ptsBottom[i].y);
+        ctx.lineTo(ptsTop[i].x, ptsTop[i].y);
+        ctx.stroke();
+    }
+
+    // Vẽ & Tô bóng mặt trên
+    buildRoundedPath(ctx, d1, d2, d3, cx - d1/3, cy - 20, r1, r2, r3, r4);
+    ctx.fill();
     ctx.stroke();
 
-    // Vẽ Mặt trước phải
-    ctx.beginPath();
-    ctx.moveTo(p0.x, p0.y);
-    ctx.lineTo(p3.x, p3.y);
-    ctx.lineTo(p3_top.x, p3_top.y);
-    ctx.lineTo(p0_top.x, p0_top.y);
-    ctx.closePath();
-    ctx.stroke();
+    // Nhãn kích thước
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "bold 13px Segoe UI";
+    let centerBottom = isoProj(d1/2, 0, 0, cx - d1/3, cy - 20);
+    let centerLeft = isoProj(0, d2/2, 0, cx - d1/3, cy - 20);
+    let centerHeight = isoProj(0, 0, d3/2, cx - d1/3, cy - 20);
 
-    // Ghi nhãn kích thước chuẩn vị trí không chèn vào hình
-    ctx.fillText(label1, (p0.x + p1.x) / 2 - 15, (p0.y + p1.y) / 2 + 20);
-    ctx.fillText(label2, (p0.x + p3.x) / 2 - 50, (p0.y + p3.y) / 2 + 20);
-    ctx.fillText(label3, p0.x - 60, p0.y - d3 / 2);
+    ctx.fillText(label1, centerBottom.x - 15, centerBottom.y + 22);
+    ctx.fillText(label2, centerLeft.x - 55, centerLeft.y + 15);
+    ctx.fillText(label3, centerHeight.x - 60, centerHeight.y);
 }
 
 /* KHUNG CHAT VOICE */
