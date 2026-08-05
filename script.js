@@ -44,7 +44,7 @@ function draw() {
     let cx = c.width / 2 - 40;
     let cy = c.height / 2 + 30;
 
-    // Vẽ hình 3D theo đúng hệ tọa độ đã chuẩn hóa (Hình 2)
+    // Xoay hướng mặt cắt theo đúng trục tọa độ chuẩn (Hình 2)
     if (ORI === "Z") {
         drawBox3D(cx, cy, l, w, h, R1, R2, R3, R4, `L = ${L}`, `W = ${W}`, `H = ${H}`);
     } else if (ORI === "X") {
@@ -54,14 +54,14 @@ function draw() {
     }
 }
 
-/* 1. CHỈNH SỬA TRỤC TỌA ĐỘ THEO ĐÚNG HÌNH 2 */
+/* 1. SỬA TRỤC TỌA ĐỘ CHUẨN THEO HÌNH 2 */
 function drawAxis() {
     ctx.lineWidth = 2.5;
     ctx.font = "bold 13px Segoe UI";
 
     let x0 = 50, y0 = 220;
 
-    // Trục X (Đỏ) - Nằm ngang hoàn toàn sang phải
+    // Trục X (Đỏ) - Nằm ngang sang phải
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
@@ -70,7 +70,7 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("X", x0 + 55, y0 + 4);
 
-    // Trục Y (Xanh nước biển) - Chéo lên 45 độ sang phải
+    // Trục Y (Xanh dương) - Nghiêng 45 độ sang phải
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
@@ -79,7 +79,7 @@ function drawAxis() {
     ctx.stroke();
     ctx.fillText("Y", x0 + 40, y0 - 38);
 
-    // Trục Z (Xanh lá cây) - Thẳng đứng lên trên
+    // Trục Z (Xanh lá) - Thẳng đứng lên trên
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
@@ -89,9 +89,9 @@ function drawAxis() {
     ctx.fillText("Z", x0 - 4, y0 - 55);
 }
 
-/* 2. CHUYỂN ĐỔI TỌA ĐỘ 3D SANG 2D ĐỒNG BỘ MỚI (X ngang, Y chéo, Z đứng) */
+/* 2. CHUYỂN ĐỔI TỌA ĐỘ ISO ĐỒNG BỘ TRỤC TỌA ĐỘ CHUẨN */
 function projectISO(x, y, z, cx, cy) {
-    let kY = 0.7; // Độ nghiêng trục Y
+    let kY = 0.6; // Hệ số nghiêng góc của trục Y
     return {
         x: cx + x + y * kY,
         y: cy - z - y * kY
@@ -121,7 +121,7 @@ function pathLoop(ctx, d1, d2, zLvl, cx, cy, r1, r2, r3, r4) {
     ctx.closePath();
 }
 
-/* 3. TỐI ƯU ĐỒ HỌA 3D VÀ HIỆU ỨNG MẶT ĐẸP MẮT CHO CÁC MẶT XOZ VÀ YOZ */
+/* 3. TỐI ƯU ĐỒ HỌA VÀ ĐỔ BÓNG CHO MẶT XOZ VÀ YOZ ĐẸP MẮT */
 function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     ctx.lineWidth = 1.8;
     ctx.strokeStyle = "#1e293b";
@@ -129,18 +129,18 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     let offsetX = cx - d1 / 2;
     let offsetY = cy + d3 / 2;
 
-    // Đổ bóng màu mượt cho khối 3D
+    // Gradient đổ bóng mặt trên cho hiệu ứng 3D rõ nét
     let gradTop = ctx.createLinearGradient(0, 0, 0, 200);
-    gradTop.addColorStop(0, "rgba(59, 130, 246, 0.35)");
-    gradTop.addColorStop(1, "rgba(147, 197, 253, 0.15)");
+    gradTop.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+    gradTop.addColorStop(1, "rgba(147, 197, 253, 0.2)");
 
-    // Mặt dưới (Đáy)
-    ctx.fillStyle = "rgba(203, 213, 225, 0.3)";
+    // Vẽ & tô mặt đáy
+    ctx.fillStyle = "rgba(226, 232, 240, 0.4)";
     pathLoop(ctx, d1, d2, 0, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
-    // Các đường cạnh nối 4 góc
+    // Các đường đứng nối góc
     let bEdge = [
         projectISO(r1, 0, 0, offsetX, offsetY),
         projectISO(d1 - r2, 0, 0, offsetX, offsetY),
@@ -162,13 +162,13 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
         ctx.stroke();
     }
 
-    // Mặt trên (Mặt chính)
+    // Vẽ & tô mặt đỉnh
     ctx.fillStyle = gradTop;
     pathLoop(ctx, d1, d2, d3, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
-    // Hiển thị nhãn kích thước rõ ràng, sắc nét
+    // Hiển thị kích thước đẹp mắt, không chèn lên cạnh hình
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 13px Segoe UI";
 
@@ -177,7 +177,7 @@ function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
 
     ctx.fillText(lbl1, c1.x - 15, c1.y + 18);
-    ctx.fillText(lbl2, c2.x + 8, c2.y + 4);
+    ctx.fillText(lbl2, c2.x + 10, c2.y + 4);
     ctx.fillText(lbl3, c3.x - 55, c3.y + 4);
 }
 
