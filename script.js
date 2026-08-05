@@ -3,7 +3,6 @@ const ctx = c.getContext("2d");
 
 let ORI = "Z";
 
-/* CHỌN HƯỚNG VÀ VẼ LẠI */
 function setOri(o) {
     ORI = o;
     document.querySelectorAll(".ori button").forEach(b => b.classList.remove("active"));
@@ -11,7 +10,6 @@ function setOri(o) {
     draw();
 }
 
-/* HÀM VẼ TỔNG HỢP REAL-TIME HÌNH 3D BO GÓC */
 function draw() {
     c.width = c.offsetWidth;
     c.height = 280;
@@ -44,54 +42,49 @@ function draw() {
     let R4 = Math.min(r4 * scale, l / 2, w / 2);
 
     let cx = c.width / 2;
-    let cy = c.height / 2 + 10;
+    let cy = c.height / 2 + 20;
 
     if (ORI === "Z") {
-        drawRoundedBox(cx, cy, l, w, h, R1, R2, R3, R4, "L = " + L, "W = " + W, "H = " + H);
+        drawBox3D(cx, cy, l, w, h, R1, R2, R3, R4, `L = ${L}`, `W = ${W}`, `H = ${H}`);
     } else if (ORI === "X") {
-        drawRoundedBox(cx, cy, w, h, l, R1, R2, R3, R4, "W = " + W, "H = " + H, "L = " + L);
+        drawBox3D(cx, cy, h, w, l, R1, R2, R3, R4, `H = ${H}`, `W = ${W}`, `L = ${L}`);
     } else if (ORI === "Y") {
-        drawRoundedBox(cx, cy, l, h, w, R1, R2, R3, R4, "L = " + L, "H = " + H, "W = " + W);
+        drawBox3D(cx, cy, l, h, w, R1, R2, R3, R4, `L = ${L}`, `H = ${H}`, `W = ${W}`);
     }
 }
 
-/* TRỤC TỌA ĐỘ BÀN TAY PHẢI */
 function drawAxis() {
     ctx.lineWidth = 2.5;
-    ctx.font = "bold 14px Segoe UI";
+    ctx.font = "bold 13px Segoe UI";
 
     let x0 = 50, y0 = 220;
 
-    // Trục X (Đỏ)
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 50, y0);
+    ctx.lineTo(x0 + 45, y0);
     ctx.stroke();
-    ctx.fillText("X", x0 + 55, y0 + 5);
+    ctx.fillText("X", x0 + 50, y0 + 4);
 
-    // Trục Y (Xanh nước biển)
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 35, y0 - 30);
+    ctx.lineTo(x0 + 32, y0 - 24);
     ctx.stroke();
-    ctx.fillText("Y", x0 + 40, y0 - 32);
+    ctx.fillText("Y", x0 + 36, y0 - 26);
 
-    // Trục Z (Xanh lá cây)
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0, y0 - 50);
+    ctx.lineTo(x0, y0 - 45);
     ctx.stroke();
-    ctx.fillText("Z", x0 - 5, y0 - 55);
+    ctx.fillText("Z", x0 - 4, y0 - 50);
 }
 
-/* BIẾN ĐỔI ISO */
-function isoProj(x, y, z, cx, cy) {
+function projectISO(x, y, z, cx, cy) {
     let cos30 = 0.866;
     let sin30 = 0.5;
     return {
@@ -100,146 +93,195 @@ function isoProj(x, y, z, cx, cy) {
     };
 }
 
-/* TẠO ĐƯỜNG DẪN MẶT ĐÁY VỚI 4 GÓC BO CORNER RADIUS */
-function buildRoundedPath(ctx, d1, d2, zLevel, cx, cy, r1, r2, r3, r4) {
-    let p0 = isoProj(0, 0, zLevel, cx, cy);
-    let p1 = isoProj(d1, 0, zLevel, cx, cy);
-    let p2 = isoProj(d1, d2, zLevel, cx, cy);
-    let p3 = isoProj(0, d2, zLevel, cx, cy);
+function pathLoop(ctx, d1, d2, zLvl, cx, cy, r1, r2, r3, r4) {
+    let p0 = projectISO(0, 0, zLvl, cx, cy);
+    let p1 = projectISO(d1, 0, zLvl, cx, cy);
+    let p2 = projectISO(d1, d2, zLvl, cx, cy);
+    let p3 = projectISO(0, d2, zLvl, cx, cy);
 
     ctx.beginPath();
-    
-    // Góc R1 (0,0)
-    let p0_a = isoProj(r1, 0, zLevel, cx, cy);
-    let p0_b = isoProj(0, r1, zLevel, cx, cy);
-    ctx.moveTo(p0_a.x, p0_a.y);
+    ctx.moveTo(projectISO(r1, 0, zLvl, cx, cy).x, projectISO(r1, 0, zLvl, cx, cy).y);
 
-    // Đến Góc R2 (d1,0)
-    let p1_a = isoProj(d1 - r2, 0, zLevel, cx, cy);
-    let p1_b = isoProj(d1, r2, zLevel, cx, cy);
-    ctx.lineTo(p1_a.x, p1_a.y);
-    ctx.quadraticCurveTo(p1.x, p1.y, p1_b.x, p1_b.y);
+    ctx.lineTo(projectISO(d1 - r2, 0, zLvl, cx, cy).x, projectISO(d1 - r2, 0, zLvl, cx, cy).y);
+    ctx.quadraticCurveTo(p1.x, p1.y, projectISO(d1, r2, zLvl, cx, cy).x, projectISO(d1, r2, zLvl, cx, cy).y);
 
-    // Đến Góc R3 (d1,d2)
-    let p2_a = isoProj(d1, d2 - r3, zLevel, cx, cy);
-    let p2_b = isoProj(d1 - r3, d2, zLevel, cx, cy);
-    ctx.lineTo(p2_a.x, p2_a.y);
-    ctx.quadraticCurveTo(p2.x, p2.y, p2_b.x, p2_b.y);
+    ctx.lineTo(projectISO(d1, d2 - r3, zLvl, cx, cy).x, projectISO(d1, d2 - r3, zLvl, cx, cy).y);
+    ctx.quadraticCurveTo(p2.x, p2.y, projectISO(d1 - r3, d2, zLvl, cx, cy).x, projectISO(d1 - r3, d2, zLvl, cx, cy).y);
 
-    // Đến Góc R4 (0,d2)
-    let p3_a = isoProj(r4, d2, zLevel, cx, cy);
-    let p3_b = isoProj(0, d2 - r4, zLevel, cx, cy);
-    ctx.lineTo(p3_a.x, p3_a.y);
-    ctx.quadraticCurveTo(p3.x, p3.y, p3_b.x, p3_b.y);
+    ctx.lineTo(projectISO(r4, d2, zLvl, cx, cy).x, projectISO(r4, d2, zLvl, cx, cy).y);
+    ctx.quadraticCurveTo(p3.x, p3.y, projectISO(0, d2 - r4, zLvl, cx, cy).x, projectISO(0, d2 - r4, zLvl, cx, cy).y);
 
-    // Về Góc R1
-    ctx.lineTo(p0_b.x, p0_b.y);
-    ctx.quadraticCurveTo(p0.x, p0.y, p0_a.x, p0_a.y);
+    ctx.lineTo(projectISO(0, r1, zLvl, cx, cy).x, projectISO(0, r1, zLvl, cx, cy).y);
+    ctx.quadraticCurveTo(p0.x, p0.y, projectISO(r1, 0, zLvl, cx, cy).x, projectISO(r1, 0, zLvl, cx, cy).y);
     ctx.closePath();
 }
 
-/* VẼ KHỐI 3D CHÂN THỰC VỚI BO GÓC */
-function drawRoundedBox(cx, cy, d1, d2, d3, r1, r2, r3, r4, label1, label2, label3) {
+function drawBox3D(cx, cy, d1, d2, d3, r1, r2, r3, r4, lbl1, lbl2, lbl3) {
     ctx.lineWidth = 2;
     ctx.strokeStyle = "#1e293b";
-    ctx.fillStyle = "rgba(45, 137, 239, 0.15)";
+    ctx.fillStyle = "rgba(45, 137, 239, 0.2)";
 
-    // Vẽ & Tô bóng mặt dưới
-    buildRoundedPath(ctx, d1, d2, 0, cx - d1/3, cy - 20, r1, r2, r3, r4);
+    let offsetX = cx - d1/2;
+    let offsetY = cy - d2/2;
+
+    pathLoop(ctx, d1, d2, 0, offsetX, offsetY, r1, r2, r3, r4);
     ctx.stroke();
 
-    // Vẽ các đường dựng đứng 4 góc bo
-    let ptsBottom = [
-        isoProj(r1, 0, 0, cx - d1/3, cy - 20),
-        isoProj(d1 - r2, 0, 0, cx - d1/3, cy - 20),
-        isoProj(d1, d2 - r3, 0, cx - d1/3, cy - 20),
-        isoProj(r4, d2, 0, cx - d1/3, cy - 20)
+    let bEdge = [
+        projectISO(r1, 0, 0, offsetX, offsetY),
+        projectISO(d1 - r2, 0, 0, offsetX, offsetY),
+        projectISO(d1, d2 - r3, 0, offsetX, offsetY),
+        projectISO(r4, d2, 0, offsetX, offsetY)
     ];
 
-    let ptsTop = [
-        isoProj(r1, 0, d3, cx - d1/3, cy - 20),
-        isoProj(d1 - r2, 0, d3, cx - d1/3, cy - 20),
-        isoProj(d1, d2 - r3, d3, cx - d1/3, cy - 20),
-        isoProj(r4, d2, d3, cx - d1/3, cy - 20)
+    let tEdge = [
+        projectISO(r1, 0, d3, offsetX, offsetY),
+        projectISO(d1 - r2, 0, d3, offsetX, offsetY),
+        projectISO(d1, d2 - r3, d3, offsetX, offsetY),
+        projectISO(r4, d2, d3, offsetX, offsetY)
     ];
 
-    for(let i=0; i<4; i++) {
+    for(let i = 0; i < 4; i++) {
         ctx.beginPath();
-        ctx.moveTo(ptsBottom[i].x, ptsBottom[i].y);
-        ctx.lineTo(ptsTop[i].x, ptsTop[i].y);
+        ctx.moveTo(bEdge[i].x, bEdge[i].y);
+        ctx.lineTo(tEdge[i].x, tEdge[i].y);
         ctx.stroke();
     }
 
-    // Vẽ & Tô bóng mặt trên
-    buildRoundedPath(ctx, d1, d2, d3, cx - d1/3, cy - 20, r1, r2, r3, r4);
+    pathLoop(ctx, d1, d2, d3, offsetX, offsetY, r1, r2, r3, r4);
     ctx.fill();
     ctx.stroke();
 
-    // Nhãn kích thước
-    ctx.fillStyle = "#1e293b";
+    ctx.fillStyle = "#0f172a";
     ctx.font = "bold 13px Segoe UI";
-    let centerBottom = isoProj(d1/2, 0, 0, cx - d1/3, cy - 20);
-    let centerLeft = isoProj(0, d2/2, 0, cx - d1/3, cy - 20);
-    let centerHeight = isoProj(0, 0, d3/2, cx - d1/3, cy - 20);
+    
+    let c1 = projectISO(d1 / 2, 0, 0, offsetX, offsetY);
+    let c2 = projectISO(0, d2 / 2, 0, offsetX, offsetY);
+    let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
 
-    ctx.fillText(label1, centerBottom.x - 15, centerBottom.y + 22);
-    ctx.fillText(label2, centerLeft.x - 55, centerLeft.y + 15);
-    ctx.fillText(label3, centerHeight.x - 60, centerHeight.y);
+    ctx.fillText(lbl1, c1.x - 15, c1.y + 20);
+    ctx.fillText(lbl2, c2.x - 55, c2.y + 15);
+    ctx.fillText(lbl3, c3.x - 55, c3.y - 5);
 }
 
-/* KHUNG CHAT VOICE */
 function log(t) {
     const chatBox = document.getElementById("chat");
     chatBox.innerHTML += `<div>${t}</div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-/* ĐIỀU KHIỂN GIỌNG NÓI */
+/* KÍCH HOẠT VOICE CHAT */
 function voice() {
-    speak("Hãy đọc kích thước dài rộng cao");
+    speak("Xin chào, tôi có thể giúp gì cho bạn");
+    log("🤖 Xin chào, tôi có thể giúp gì cho bạn");
 
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-        alert("Trình duyệt không hỗ trợ Voice!");
+        alert("Trình duyệt của bạn chưa hỗ trợ Voice!");
         return;
     }
 
     let r = new SR();
-    r.lang = "vi-VN";
+    r.lang = "vi-VN"; 
     r.continuous = false;
+    r.interimResults = false;
 
     r.onresult = e => {
         let text = e.results[0][0].transcript;
-        process(text);
+        processFullVoiceNLP(text);
     };
 
-    r.start();
+    setTimeout(() => {
+        r.start();
+    }, 2200);
 }
 
-/* XỬ LÝ CHUYỂN GIỌNG NÓI THÀNH SỐ */
-function process(t) {
+/* XỬ LÝ NLP GIỌNG NÓI TỰ NHIÊN - TỰ ĐỘNG BẮT TẤT CẢ CÁC CỘT (POSITION, DIMENSION, RADIUS) */
+function processFullVoiceNLP(t) {
     log("👤 " + t);
-    let nums = t.match(/\d+([.,]\d+)?/g);
+    let str = t.toLowerCase();
+    let updatedCount = 0;
 
-    if (nums && nums.length >= 3) {
-        document.getElementById("dx").value = nums[0].replace(',', '.');
-        document.getElementById("dy").value = nums[1].replace(',', '.');
-        document.getElementById("dz").value = nums[2].replace(',', '.');
+    // Hàm hỗ trợ tìm số đứng gần từ khóa
+    const findVal = (keywords) => {
+        for (let kw of keywords) {
+            // Khớp dạng "từ khóa + (là/bằng/:)? + số"
+            let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\d+(?:[.,]\\d+)?)`, "i");
+            let match = str.match(regex);
+            if (match) return match[1].replace(',', '.');
+        }
+        return null;
+    };
+
+    // 1. Trích xuất Position (X, Y, Z)
+    let posX = findVal(["vị trí x", "pos x", "tọa độ x", "position x"]);
+    let posY = findVal(["vị trí y", "pos y", "tọa độ y", "position y"]);
+    let posZ = findVal(["vị trí z", "pos z", "tọa độ z", "position z"]);
+
+    if (posX !== null) { document.getElementById("px").value = posX; updatedCount++; }
+    if (posY !== null) { document.getElementById("py").value = posY; updatedCount++; }
+    if (posZ !== null) { document.getElementById("pz").value = posZ; updatedCount++; }
+
+    // 2. Trích xuất Dimension (Length, Width, Height)
+    let len = findVal(["chiều dài", "độ dài", "dài", "length"]);
+    let wid = findVal(["chiều rộng", "độ rộng", "rộng", "width"]);
+    let hei = findVal(["chiều cao", "độ cao", "cao", "height"]);
+
+    if (len !== null) { document.getElementById("dx").value = len; updatedCount++; }
+    if (wid !== null) { document.getElementById("dy").value = wid; updatedCount++; }
+    if (hei !== null) { document.getElementById("dz").value = hei; updatedCount++; }
+
+    // 3. Trích xuất Corner Radius (R1, R2, R3, R4)
+    let rad1 = findVal(["r1", "radius 1", "bo góc 1"]);
+    let rad2 = findVal(["r2", "radius 2", "bo góc 2"]);
+    let rad3 = findVal(["r3", "radius 3", "bo góc 3"]);
+    let rad4 = findVal(["r4", "radius 4", "bo góc 4"]);
+    let radAll = findVal(["bo góc", "bán kính", "radius"]);
+
+    if (rad1 !== null) { document.getElementById("r1").value = rad1; updatedCount++; }
+    if (rad2 !== null) { document.getElementById("r2").value = rad2; updatedCount++; }
+    if (rad3 !== null) { document.getElementById("r3").value = rad3; updatedCount++; }
+    if (rad4 !== null) { document.getElementById("r4").value = rad4; updatedCount++; }
+    
+    // Nếu chỉ nói chung chung "bo góc 100" hoặc "bán kính 100" -> tự gán cho cả 4 góc
+    if (radAll !== null && rad1 === null && rad2 === null && rad3 === null && rad4 === null) {
+        document.getElementById("r1").value = radAll;
+        document.getElementById("r2").value = radAll;
+        document.getElementById("r3").value = radAll;
+        document.getElementById("r4").value = radAll;
+        updatedCount++;
+    }
+
+    // 4. Nếu đọc liên tiếp 3 số tự nhiên (Trường hợp đọc nhanh: "2000 1000 300")
+    if (updatedCount === 0) {
+        let rawNums = str.match(/\d+([.,]\d+)?/g);
+        if (rawNums && rawNums.length >= 3) {
+            document.getElementById("dx").value = rawNums[0].replace(',', '.');
+            document.getElementById("dy").value = rawNums[1].replace(',', '.');
+            document.getElementById("dz").value = rawNums[2].replace(',', '.');
+            updatedCount = 3;
+        }
+    }
+
+    // Cập nhật lại hình ảnh & Phản hồi
+    if (updatedCount > 0) {
         draw();
-        speak("Đã cập nhật dữ liệu");
+        speak("File của bạn đã được tạo xong");
+        log("🤖 File của bạn đã được tạo xong");
     } else {
-        speak("Chưa nhận diện đủ 3 thông số dài rộng cao");
+        speak("Chưa nhận diện được thông số, vui lòng thử lại!");
+        log("🤖 Chưa nhận diện được thông số, vui lòng thử lại!");
     }
 }
 
-/* ĐỌC PHẢN HỒI */
 function speak(t) {
+    window.speechSynthesis.cancel();
     let u = new SpeechSynthesisUtterance(t);
     u.lang = "vi-VN";
-    speechSynthesis.speak(u);
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
 }
 
-/* XUẤT FILE Opening.mac ĐÚNG CẤU TRÚC AVEVA */
 function saveFile() {
     let px = +document.getElementById("px").value || 0;
     let py = +document.getElementById("py").value || 0;
@@ -301,7 +343,6 @@ END`;
     a.click();
 }
 
-/* RESET FORM VỀ MẶC ĐỊNH */
 function reset() {
     document.getElementById("px").value = 0;
     document.getElementById("py").value = 0;
@@ -316,12 +357,10 @@ function reset() {
     setOri('Z');
 }
 
-/* HELP LINK */
 function help() {
     window.open("https://drive.google.com/file/d/14NNDzXSCG63m1yQZb51tZhrZfd5k8KPf/view?usp=sharing");
 }
 
-/* EVENT LISTENERS TỰ ĐỘNG CẬP NHẬT CANVAS */
 document.querySelectorAll("input").forEach(i => {
     i.addEventListener("input", draw);
 });
