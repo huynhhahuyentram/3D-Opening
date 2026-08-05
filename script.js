@@ -285,6 +285,7 @@ function speak(t) {
     window.speechSynthesis.speak(u);
 }
 
+/* CHỈ SỬA LOGIC XUẤT ORI TƯƠNG ỨNG NÚT BẤM */
 function saveFile() {
     let px = +document.getElementById("px").value || 0;
     let py = +document.getElementById("py").value || 0;
@@ -351,7 +352,7 @@ END`;
     let blob = new Blob([data], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `Opening_${ORI}.mac`;
+    a.download = `Opening.mac`;
     a.click();
 }
 
