@@ -1,185 +1,185 @@
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #eef2f7;
-  font-size: 15px;
-  padding: 20px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #eef2f7;
+    font-size: 15px;
+    padding: 20px 0;
 }
 
 .app {
-  width: 960px;
-  margin: auto;
+    width: 960px;
+    margin: auto;
 }
 
 #view {
-  width: 100%;
-  height: 280px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-  display: block;
+    width: 100%;
+    height: 280px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    display: block;
 }
 
 .panel {
-  background: #ffffff;
-  padding: 24px;
-  margin-top: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    background: #ffffff;
+    padding: 24px;
+    margin-top: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
 }
 
 .row {
-  display: flex;
-  gap: 40px;
+    display: flex;
+    gap: 40px;
 }
 
 .box {
-  flex: 1;
-  margin-bottom: 20px;
+    flex: 1;
+    margin-bottom: 20px;
 }
 
 h3 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #1a252f;
-  margin-bottom: 12px;
-  border-bottom: 2.5px solid #2d89ef;
-  display: inline-block;
-  padding-bottom: 4px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a252f;
+    margin-bottom: 12px;
+    border-bottom: 2.5px solid #2d89ef;
+    display: inline-block;
+    padding-bottom: 4px;
 }
 
 .input-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .input-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .input-item label {
-  font-weight: 600;
-  font-size: 15px;
-  color: #34495e;
-  width: 130px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #34495e;
+    width: 130px;
 }
 
 .input-item input {
-  flex: 1;
-  height: 38px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #2c3e50;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 0 12px;
-  outline: none;
-  transition: all 0.2s ease-in-out;
+    flex: 1;
+    height: 38px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 12px;
+    outline: none;
+    transition: all 0.2s ease-in-out;
 }
 
 /* SỬA LỖI 2: TẮT MŨI TÊN TĂNG GIẢM SỐ TRÊN MỌI TRÌNH DUYỆT (CHROME, SAFARI, EDGE, FIREFOX) */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none !important;
-  margin: 0 !important;
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none !important; 
+    margin: 0 !important; 
 }
 
 input[type=number] {
-  -moz-appearance: textfield !important;
-  appearance: textfield !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
 }
 
 .input-item input:focus {
-  border-color: #2d89ef;
-  box-shadow: 0 0 0 3px rgba(45, 137, 239, 0.15);
+    border-color: #2d89ef;
+    box-shadow: 0 0 0 3px rgba(45, 137, 239, 0.15);
 }
 
 .radius {
-  display: flex;
-  gap: 15px;
+    display: flex;
+    gap: 15px;
 }
 
 .radius label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  font-weight: 600;
-  font-size: 14px;
-  color: #34495e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    font-weight: 600;
+    font-size: 14px;
+    color: #34495e;
 }
 
 .radius input {
-  width: 100%;
-  height: 38px;
-  margin-top: 5px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #2c3e50;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 0 10px;
-  outline: none;
+    width: 100%;
+    height: 38px;
+    margin-top: 5px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 10px;
+    outline: none;
 }
 
 .ori {
-  display: flex;
-  justify-content: flex-start;
-  gap: 15px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
 }
 
 .ori button {
-  width: 75px;
-  height: 38px;
-  border: none;
-  border-radius: 8px;
-  background: #e2e8f0;
-  font-weight: bold;
-  font-size: 15px;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+    width: 75px;
+    height: 38px;
+    border: none;
+    border-radius: 8px;
+    background: #e2e8f0;
+    font-weight: bold;
+    font-size: 15px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 
 .ori button:hover {
-  background: #cbd5e1;
+    background: #cbd5e1;
 }
 
 .ori .active {
-  background: #2d89ef;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(45, 137, 239, 0.3);
+    background: #2d89ef;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(45, 137, 239, 0.3);
 }
 
 .btns {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
 }
 
 .btns button {
-  flex: 1;
-  height: 44px;
-  border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 
 .btns button:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
+    opacity: 0.92;
+    transform: translateY(-1px);
 }
 
 .ok { background: #2d89ef; }
@@ -188,13 +188,150 @@ input[type=number] {
 .reset { background: #e74c3c; }
 
 #chat {
-  height: 100px;
-  margin-top: 18px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 10px;
-  overflow-y: auto;
-  font-size: 14px;
-  color: #334155;
+    height: 100px;
+    margin-top: 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 14px;
+    color: #334155;
 }
+const c = document.getElementById("view");
+const ctx = c.getContext("2d");
+
+let ORI = "Z";
+
+function setOri(o) {
+    ORI = o;
+    document.querySelectorAll(".ori button").forEach(b => b.classList.remove("active"));
+    document.getElementById("o" + o).classList.add("active");
+}
+
+// ================= VOICE =================
+let recognition;
+
+function startVoice(inputId) {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Trình duyệt không hỗ trợ Voice");
+        return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "vi-VN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = function (event) {
+        let text = event.results[0][0].transcript;
+        console.log("Voice:", text);
+
+        let value = parseVietnameseNumber(text);
+        document.getElementById(inputId).value = value;
+    };
+
+    recognition.start();
+}
+
+// ================= PARSE NUMBER (QUAN TRỌNG) =================
+function parseVietnameseNumber(text) {
+    text = text.toLowerCase().trim();
+
+    // Chuẩn hóa dấu
+    text = text.replace(/,/g, '.');
+
+    // Xử lý số âm
+    let negative = false;
+    if (text.includes("âm") || text.includes("trừ") || text.startsWith("-")) {
+        negative = true;
+    }
+
+    // Bảng số
+    const numMap = {
+        "không": 0, "linh": 0, "lẻ": 0,
+        "một": 1, "mốt": 1,
+        "hai": 2,
+        "ba": 3,
+        "bốn": 4, "tư": 4,
+        "năm": 5, "lăm": 5,
+        "sáu": 6,
+        "bảy": 7,
+        "tám": 8,
+        "chín": 9
+    };
+
+    let tokens = text.split(/\s+/);
+
+    let total = 0;
+    let current = 0;
+
+    tokens.forEach(word => {
+        if (numMap[word] !== undefined) {
+            current += numMap[word];
+        }
+        else if (word === "mười") {
+            current = current === 0 ? 10 : current * 10;
+        }
+        else if (word === "trăm") {
+            current *= 100;
+        }
+        else if (word === "nghìn" || word === "ngàn") {
+            total += current * 1000;
+            current = 0;
+        }
+        else if (word === "triệu") {
+            total += current * 1000000;
+            current = 0;
+        }
+        else if (word === "tỷ") {
+            total += current * 1000000000;
+            current = 0;
+        }
+    });
+
+    total += current;
+
+    // ================= THẬP PHÂN =================
+    if (text.includes("phẩy") || text.includes(".")) {
+        let parts = text.split(/phẩy|\./);
+        let intPart = parseVietnameseNumber(parts[0].replace("âm", "").trim());
+        let decimalWords = parts[1].trim().split(/\s+/);
+
+        let decimalStr = "";
+        decimalWords.forEach(w => {
+            if (numMap[w] !== undefined) {
+                decimalStr += numMap[w];
+            }
+        });
+
+        let result = parseFloat(intPart + "." + decimalStr);
+        return negative ? -result : result;
+    }
+
+    return negative ? -total : total;
+}
+
+// ================= DRAW (GIỮ NGUYÊN) =================
+function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    let px = parseFloat(document.getElementById("px").value) || 0;
+    let py = parseFloat(document.getElementById("py").value) || 0;
+    let pz = parseFloat(document.getElementById("pz").value) || 0;
+
+    let w = parseFloat(document.getElementById("w").value) || 1000;
+    let h = parseFloat(document.getElementById("h").value) || 1000;
+
+    ctx.strokeStyle = "#000";
+    ctx.strokeRect(100 + px * 0.1, 50 + py * 0.1, w * 0.1, h * 0.1);
+
+    ctx.fillText(`ORI: ${ORI}`, 10, 20);
+}
+
+// ================= AUTO UPDATE =================
+document.querySelectorAll("input").forEach(i => {
+    i.addEventListener("input", draw);
+});
+
+draw();
