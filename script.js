@@ -203,75 +203,57 @@ function processFullVoiceNLP(t) {
     log("👤 " + t);
     
     // Chuẩn hóa văn bản: thay thế các từ phát âm nói sang định dạng ký hiệu chuẩn
+
+    // 1. Chuẩn hóa chuỗi văn bản nhận diện
     let str = t.toLowerCase()
                .replace(/\b(âm|trừ)\b/g, "-")
                .replace(/\bphẩy\b/g, ".")
                .replace(/\bchấm\b/g, ".");
+               .replace(/\bphẩy\b/g, ",")
+               .replace(/\bchấm\b/g, "");
+
+    // 2. Xóa bỏ toàn bộ dấu chấm phân cách hàng nghìn (VD: "5.007,5" -> "5007,5")
+    // Giữ nguyên phần thập phân đứng sau dấu phẩy
+    str = str.replace(/(\d+)\.(\d{3})/g, '$1$2');
 
     let updatedCount = 0;
 
     // Trích xuất số chuẩn (Bao gồm cả số âm và số thập phân như -2007.5)
+    // Hàm làm sạch và định dạng số chính xác về dạng Javascript float
     const cleanNumberString = (numStr) => {
         if (!numStr) return "0";
         numStr = numStr.trim().replace(/\s+/g, '');
+        // Chuyển dấu phẩy thập phân sang dấu chấm tiêu chuẩn của thẻ Input HTML
         return numStr.replace(',', '.');
     };
 
     const findVal = (keywords) => {
         for (let kw of keywords) {
+            // Match số âm, số nguyên hoặc số thập phân có chứa dấu phẩy/chấm
             let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\s*\\d+(?:[.,]\\d+)?)`, "i");
             let match = str.match(regex);
             if (match) {
-                return cleanNumberString(match[1]);
-            }
-        }
+@@ -228,12 +234,12 @@
         return null;
     };
 
     // 1. Nhận diện Orientation (Nhận diện linh hoạt từ ngữ tự nhiên)
+    // 1. Nhận diện Orientation
     if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?x\b/i.test(str)) { setOri('X'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?y\b/i.test(str)) { setOri('Y'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?(z|zét|zed)\b/i.test(str)) { setOri('Z'); updatedCount++; }
 
     // 2. Nhận diện Position (X, Y, Z - Khắc phục các từ bị nhận diện sai/nhầm âm)
+    // 2. Nhận diện Position (X, Y, Z)
     let posX = findVal(["tọa độ x", "vị trí x", "pos x", "position x", "đồ ít", "tọa độ ít", "tọa độ xy", "x"]);
     let posY = findVal(["tọa độ y", "vị trí y", "pos y", "position y", "y"]);
     let posZ = findVal(["tọa độ zét", "tọa độ zed", "tọa độ z", "vị trí z", "pos z", "position z", "z"]);
-
-    if (posX !== null) { document.getElementById("px").value = posX; updatedCount++; }
-    if (posY !== null) { document.getElementById("py").value = posY; updatedCount++; }
-    if (posZ !== null) { document.getElementById("pz").value = posZ; updatedCount++; }
-
-    // 3. Nhận diện Dimension (L, W, H)
-    let len = findVal(["chiều dài", "độ dài", "dài", "length", "l"]);
-    let wid = findVal(["chiều rộng", "độ rộng", "rộng", "width", "w"]);
-    let hei = findVal(["chiều cao", "độ cao", "cao", "height", "h"]);
-
-    if (len !== null) { document.getElementById("dx").value = len; updatedCount++; }
-    if (wid !== null) { document.getElementById("dy").value = wid; updatedCount++; }
-    if (hei !== null) { document.getElementById("dz").value = hei; updatedCount++; }
-
-    // 4. Nhận diện Corner Radius (R1, R2, R3, R4)
-    let rad1 = findVal(["r1", "radius 1", "bo góc 1", "bán kính 1"]);
-    let rad2 = findVal(["r2", "radius 2", "bo góc 2", "bán kính 2"]);
-    let rad3 = findVal(["r3", "radius 3", "bo góc 3", "bán kính 3"]);
-    let rad4 = findVal(["r4", "radius 4", "bo góc 4", "bán kính 4"]);
-    let radAll = findVal(["bo góc", "bán kính", "radius", "r"]);
-
-    if (rad1 !== null) { document.getElementById("r1").value = rad1; updatedCount++; }
-    if (rad2 !== null) { document.getElementById("r2").value = rad2; updatedCount++; }
-    if (rad3 !== null) { document.getElementById("r3").value = rad3; updatedCount++; }
-    if (rad4 !== null) { document.getElementById("r4").value = rad4; updatedCount++; }
-    
-    if (radAll !== null && rad1 === null && rad2 === null && rad3 === null && rad4 === null) {
-        document.getElementById("r1").value = radAll;
-        document.getElementById("r2").value = radAll;
-        document.getElementById("r3").value = radAll;
-        document.getElementById("r4").value = radAll;
+@@ -271,130 +277,130 @@
         updatedCount++;
     }
 
     // 5. Nếu nói chuỗi số tự do (Bao gồm số âm và số thập phân)
+    // 5. Nếu nói chuỗi số tự do (VD: "-5007,5 2000 2003")
     if (updatedCount === 0) {
         let rawNums = str.match(/-?\d+([.,]\d+)?/g);
         if (rawNums && rawNums.length >= 3) {
