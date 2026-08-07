@@ -13,11 +13,9 @@ function setOri(o) {
 function parseInputValue(id) {
     let raw = (document.getElementById(id).value || "").toString().trim();
     if (!raw) return 0;
-    if (/^-?\d+[.,]\d{3}$/.test(raw)) {
-        raw = raw.replace(/[.,]/g, '');
-    } else {
-        raw = raw.replace(',', '.');
-    }
+    
+    // Loại bỏ hoàn toàn dấu chấm (nếu có) và xử lý dấu phẩy làm phần thập phân
+    raw = raw.replace(/\./g, '').replace(',', '.');
     return parseFloat(raw) || 0;
 }
 
@@ -168,54 +166,60 @@ function voice() {
 
     let startMsg = "Xin chào, tôi có thể giúp gì cho bạn";
     log("🤖 " + startMsg);
-    speak(startMsg);
 
-    let r = new SR();
-    r.lang = "vi-VN"; 
-    r.continuous = true; // Cho phép giữ mic nói lâu hơn
-    r.interimResults = false;
+    window.speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(startMsg);
+    u.lang = "vi-VN";
+    u.rate = 0.95;
 
-    let silenceTimer = null;
-
-    r.onstart = () => {
+    // ĐẢM BẢO CHỈ BẬT MIC SAU KHI NÓI XONG CÂU XIN CHÀO
+    u.onend = () => {
         log("🔴 <i>Đang nghe...</i>");
+        let r = new SR();
+        r.lang = "vi-VN"; 
+        r.continuous = true; // Cho phép nói dài không bị ngắt giữa chừng
+        r.interimResults = false;
+
+        let silenceTimer = null;
+
+        r.onresult = e => {
+            let text = e.results[e.results.length - 1][0].transcript;
+            
+            // TĂNG THỜI GIAN CHỜ: Đợi 2.5s không có tiếng nói mới tắt mic để xử lý
+            clearTimeout(silenceTimer);
+            silenceTimer = setTimeout(() => {
+                r.stop();
+                processFullVoiceNLP(text);
+            }, 2500);
+        };
+
+        r.onerror = () => {
+            let errorMsg = "Chưa nhận diện được thông số, vui lòng thử lại!";
+            log("🤖 " + errorMsg);
+            speak(errorMsg);
+        };
+
+        r.start();
     };
 
-    r.onresult = e => {
-        let text = e.results[e.results.length - 1][0].transcript;
-        
-        // Tự động dừng mic sau khi người dùng dừng nói 1.5 giây
-        clearTimeout(silenceTimer);
-        silenceTimer = setTimeout(() => {
-            r.stop();
-            processFullVoiceNLP(text);
-        }, 1500);
-    };
-
-    r.onerror = () => {
-        let failMsg = "Chưa nhận diện được thông số, vui lòng thử lại!";
-        log("🤖 " + failMsg);
-        speak(failMsg);
-    };
-
-    r.start();
+    window.speechSynthesis.speak(u);
 }
 
 function processFullVoiceNLP(t) {
     log("👤 " + t);
-    
-    // 1. Chuẩn hóa chuỗi văn bản nhận diện từ nói tự nhiên
+
+    // 1. CHUẨN HÓA VĂN BẢN
     let str = t.toLowerCase()
                .replace(/\b(âm|trừ)\b/g, "-")
                .replace(/\bphẩy\b/g, ",")
                .replace(/\bchấm\b/g, "");
 
-    // 2. Loại bỏ dấu chấm hàng nghìn nhưng bảo toàn dấu phẩy thập phân (VD: "5.007,5" -> "5007,5")
-    str = str.replace(/(\d+)\.(\d{3})/g, '$1$2');
+    // 2. LOẠI BỎ TOÀN BỘ DẤU CHẤM HÀNG NGHÌN (VD: "5.007,5" -> "5007,5")
+    str = str.replace(/(\d+)\.(\d+)/g, '$1$2');
 
     let updatedCount = 0;
 
-    // Làm sạch và chuyển đổi số phức tạp có từ 1-8+ chữ số, số âm, số thập phân
+    // Hàm làm sạch và chuyển đổi dấu phẩy duy nhất thành dấu chấm thập phân tiêu chuẩn HTML
     const cleanNumberString = (numStr) => {
         if (!numStr) return "0";
         numStr = numStr.trim().replace(/\s+/g, '');
@@ -224,8 +228,8 @@ function processFullVoiceNLP(t) {
 
     const findVal = (keywords) => {
         for (let kw of keywords) {
-            // Match tất cả mọi loại số học (số âm, thập phân, số nguyên lớn)
-            let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\s*\\d+(?:[.,]\\d+)?)`, "i");
+            // Regex nhận diện chính xác số âm, số nguyên và số thập phân có dấu phẩy
+            let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\s*\\d+(?:,\\d+)?)`, "i");
             let match = str.match(regex);
             if (match) {
                 return cleanNumberString(match[1]);
@@ -234,12 +238,12 @@ function processFullVoiceNLP(t) {
         return null;
     };
 
-    // 1. Nhận diện Orientation (Linh hoạt ngôn ngữ tự nhiên)
+    // 1. Nhận diện Orientation
     if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?x\b/i.test(str)) { setOri('X'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?y\b/i.test(str)) { setOri('Y'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?(z|zét|zed)\b/i.test(str)) { setOri('Z'); updatedCount++; }
 
-    // 2. Nhận diện Position (X, Y, Z - Sửa triệt để các lỗi nhận diện từ đồng âm tiếng Việt)
+    // 2. Nhận diện Position (X, Y, Z - Bắt chuẩn từ đồng âm)
     let posX = findVal(["tọa độ x", "vị trí x", "pos x", "position x", "đồ ít", "tọa độ ít", "tọa độ xy", "x"]);
     let posY = findVal(["tọa độ y", "vị trí y", "pos y", "position y", "y"]);
     let posZ = findVal(["tọa độ zét", "tọa độ zed", "tọa độ z", "vị trí z", "pos z", "position z", "z"]);
@@ -277,9 +281,9 @@ function processFullVoiceNLP(t) {
         updatedCount++;
     }
 
-    // 5. Nếu đọc chuỗi số tự do phức tạp (Bắt chính xác dãy số âm, số thập phân bất kỳ)
+    // 5. Nếu nói chuỗi số tự do (Không có từ khóa định danh)
     if (updatedCount === 0) {
-        let rawNums = str.match(/-?\d+([.,]\d+)?/g);
+        let rawNums = str.match(/-?\d+(,\d+)?/g);
         if (rawNums && rawNums.length >= 3) {
             document.getElementById("dx").value = cleanNumberString(rawNums[0]);
             document.getElementById("dy").value = cleanNumberString(rawNums[1]);
@@ -288,7 +292,7 @@ function processFullVoiceNLP(t) {
         }
     }
 
-    // Phản hồi giọng nói và hiển thị Box Chat đúng yêu cầu
+    // Phản hồi kết quả
     if (updatedCount > 0) {
         draw();
         let successMsg = "File của bạn đã được tạo xong";
