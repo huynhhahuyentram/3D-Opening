@@ -99,7 +99,7 @@ function projectISO(x, y, z, cx, cy) {
     };
 }
 
-/* 3. VẼ HÌNH HỘP CHỮ NHẬT 3D PHẲNG KHÔNG BO GÓC (THEO HÌNH 2) */
+/* 3. VẼ HÌNH HỘP CHỮ NHẬT 3D PHẲNG KHÔNG BO GÓC */
 function drawBox3DSharp(cx, cy, d1, d2, d3, lbl1, lbl2, lbl3) {
     ctx.lineWidth = 1.8;
     let offsetX = cx - d1 / 2;
@@ -177,11 +177,12 @@ function voice() {
         return;
     }
 
-    log("🤖 Xin chào, tôi có thể giúp gì cho bạn");
+    let startMsg = "Xin chào, tôi có thể giúp gì cho bạn";
+    log("🤖 " + startMsg);
 
     // Phát lời chào trước, khi nói xong mới bắt đầu bật Micro để không bị thu nhiễu
     window.speechSynthesis.cancel();
-    let u = new SpeechSynthesisUtterance("Xin chào, tôi có thể giúp gì cho bạn");
+    let u = new SpeechSynthesisUtterance(startMsg);
     u.lang = "vi-VN";
     u.rate = 0.95;
 
@@ -189,17 +190,20 @@ function voice() {
         log("🔴 <i>Đang nghe...</i>");
         let r = new SR();
         r.lang = "vi-VN"; 
-        r.continuous = false;
+        r.continuous = true; // Kéo dài thời gian lắng nghe
         r.interimResults = false;
 
         r.onresult = e => {
-            let text = e.results[0][0].transcript;
+            let text = e.results[e.results.length - 1][0].transcript;
+            r.stop();
             processFullVoiceNLP(text);
         };
 
+        // Khi người dùng không nói hoặc xảy ra lỗi thu âm
         r.onerror = () => {
-            log("🤖 File của bạn đã được tạo xong");
-            speak("File của bạn đã được tạo xong");
+            let errorMsg = "Chưa nhận diện được thông số, vui lòng thử lại!";
+            log("🤖 " + errorMsg);
+            speak(errorMsg);
         };
 
         r.start();
@@ -242,9 +246,9 @@ function processFullVoiceNLP(t) {
     };
 
     // 1. Nhận diện Orientation (X, Y, Z)
-    if (str.includes("hướng x") || str.includes("trục x") || str.includes("ori x")) setOri('X');
-    else if (str.includes("hướng y") || str.includes("trục y") || str.includes("ori y")) setOri('Y');
-    else if (str.includes("hướng z") || str.includes("trục z") || str.includes("ori z")) setOri('Z');
+    if (str.includes("hướng x") || str.includes("trục x") || str.includes("ori x")) { setOri('X'); updatedCount++; }
+    else if (str.includes("hướng y") || str.includes("trục y") || str.includes("ori y")) { setOri('Y'); updatedCount++; }
+    else if (str.includes("hướng z") || str.includes("trục z") || str.includes("ori z")) { setOri('Z'); updatedCount++; }
 
     // 2. Nhận diện Position (X, Y, Z)
     let posX = findVal(["vị trí x", "pos x", "tọa độ x", "position x", "x"]);
@@ -295,12 +299,17 @@ function processFullVoiceNLP(t) {
         }
     }
 
+    // Phản hồi kết quả
     if (updatedCount > 0) {
         draw();
+        let successMsg = "File của bạn đã được tạo xong";
+        log("🤖 " + successMsg);
+        speak(successMsg);
+    } else {
+        let failMsg = "Chưa nhận diện được thông số, vui lòng thử lại!";
+        log("🤖 " + failMsg);
+        speak(failMsg);
     }
-    
-    speak("File của bạn đã được tạo xong");
-    log("🤖 File của bạn đã được tạo xong");
 }
 
 function speak(t) {
