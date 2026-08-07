@@ -10,296 +10,179 @@ function setOri(o) {
     draw();
 }
 
+// Hàm hỗ trợ đọc số an toàn (xóa dấu phân cách hàng nghìn nếu gõ thủ công)
 function parseInputValue(id) {
     let raw = (document.getElementById(id).value || "").toString().trim();
     if (!raw) return 0;
-    if (/^-?\d+[.,]\d{3}$/.test(raw)) {
-        raw = raw.replace(/[.,]/g, '');
-    } else {
-        raw = raw.replace(',', '.');
-    }
-    return parseFloat(raw) || 0;
-}
-
-function draw() {
-    c.width = c.offsetWidth;
-    c.height = 280;
-
-    let L = parseInputValue("dx");
-    let W = parseInputValue("dy");
-    let H = parseInputValue("dz");
-
-    ctx.clearRect(0, 0, c.width, c.height);
-
-    drawAxis();
-
-    if (L === 0 && W === 0 && H === 0) return;
-
-    let maxDim = Math.max(Math.abs(L), Math.abs(W), Math.abs(H), 100);
-    let scale = 110 / maxDim;
-
-    let l = L * scale;
-    let w = W * scale;
-    let h = H * scale;
-
-    let cx = c.width / 2 - 20;
-    let cy = c.height / 2 + 30;
-
-    if (ORI === "Z") {
-        drawBox3DSharp(cx, cy, l, w, h, `L=${L}`, `W=${W}`, `H=${H}`);
-    } else if (ORI === "X") {
-        drawBox3DSharp(cx, cy, h, w, l, `H=${H}`, `W=${W}`, `L=${L}`);
-    } else if (ORI === "Y") {
-        drawBox3DSharp(cx, cy, l, h, w, `L=${L}`, `H=${H}`, `W=${W}`);
-    }
-}
-
-/* 1. TRỤC TỌA ĐỘ CHUẨN */
-function drawAxis() {
-    ctx.lineWidth = 2.5;
-    ctx.font = "bold 13px Segoe UI";
+@@ -62,7 +61,6 @@
 
     let x0 = 50, y0 = 220;
 
+    // Trục X (Đỏ) - Nằm ngang sang phải
     ctx.strokeStyle = "#e74c3c";
     ctx.fillStyle = "#e74c3c";
     ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 50, y0);
+@@ -71,7 +69,6 @@
     ctx.stroke();
     ctx.fillText("X", x0 + 55, y0 + 4);
 
+    // Trục Y (Xanh dương) - Nghiêng 45 độ sang phải
     ctx.strokeStyle = "#2980b9";
     ctx.fillStyle = "#2980b9";
     ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 35, y0 - 35);
+@@ -80,7 +77,6 @@
     ctx.stroke();
     ctx.fillText("Y", x0 + 40, y0 - 38);
 
+    // Trục Z (Xanh lá) - Thẳng đứng lên trên
     ctx.strokeStyle = "#27ae60";
     ctx.fillStyle = "#27ae60";
     ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x0, y0 - 50);
-    ctx.stroke();
-    ctx.fillText("Z", x0 - 4, y0 - 55);
-}
-
-/* 2. CHUYỂN ĐỔI TỌA ĐỘ ISOMETRIC CHUẨN */
-function projectISO(x, y, z, cx, cy) {
-    let kY = 0.55; 
-    return {
-        x: cx + x + y * kY,
-        y: cy - z - y * kY
-    };
-}
-
-/* 3. VẼ HÌNH HỘP CHỮ NHẬT 3D PHẲNG KHÔNG BO GÓC */
-function drawBox3DSharp(cx, cy, d1, d2, d3, lbl1, lbl2, lbl3) {
-    ctx.lineWidth = 1.8;
+@@ -105,23 +101,19 @@
     let offsetX = cx - d1 / 2;
     let offsetY = cy + d3 / 2;
 
+    // Tọa độ 4 đỉnh mặt đáy (z = 0)
     let b0 = projectISO(0, 0, 0, offsetX, offsetY);
     let b1 = projectISO(d1, 0, 0, offsetX, offsetY);
     let b2 = projectISO(d1, d2, 0, offsetX, offsetY);
     let b3 = projectISO(0, d2, 0, offsetX, offsetY);
 
+    // Tọa độ 4 đỉnh mặt đỉnh (z = d3)
     let t0 = projectISO(0, 0, d3, offsetX, offsetY);
     let t1 = projectISO(d1, 0, d3, offsetX, offsetY);
     let t2 = projectISO(d1, d2, d3, offsetX, offsetY);
     let t3 = projectISO(0, d2, d3, offsetX, offsetY);
 
+    // Dynamic stroke style & Color
     ctx.strokeStyle = "#0000ff";
     ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
 
+    // 1. Vẽ mặt phẳng đáy
     ctx.beginPath();
     ctx.moveTo(b0.x, b0.y);
     ctx.lineTo(b1.x, b1.y);
-    ctx.lineTo(b2.x, b2.y);
-    ctx.lineTo(b3.x, b3.y);
-    ctx.closePath();
+@@ -131,7 +123,6 @@
     ctx.stroke();
     ctx.fill();
 
+    // 2. Vẽ 4 cạnh dọc thẳng đứng nối đáy và đỉnh
     let bEdges = [b0, b1, b2, b3];
     let tEdges = [t0, t1, t2, t3];
     for (let i = 0; i < 4; i++) {
-        ctx.beginPath();
-        ctx.moveTo(bEdges[i].x, bEdges[i].y);
-        ctx.lineTo(tEdges[i].x, tEdges[i].y);
+@@ -141,7 +132,6 @@
         ctx.stroke();
     }
 
+    // 3. Vẽ mặt phẳng đỉnh
     ctx.beginPath();
     ctx.moveTo(t0.x, t0.y);
     ctx.lineTo(t1.x, t1.y);
-    ctx.lineTo(t2.x, t2.y);
-    ctx.lineTo(t3.x, t3.y);
-    ctx.closePath();
+@@ -151,7 +141,6 @@
     ctx.stroke();
     ctx.fill();
 
+    // 4. Hiển thị thông số kích thước (L, W, H)
     ctx.fillStyle = "#1e293b";
     ctx.font = "bold 13px Segoe UI";
 
-    let c1 = projectISO(d1 / 2, 0, 0, offsetX, offsetY);
-    let c2 = projectISO(d1, d2 / 2, d3, offsetX, offsetY);
-    let c3 = projectISO(0, 0, d3 / 2, offsetX, offsetY);
-
-    ctx.fillText(lbl1, c1.x - 20, c1.y + 18);
-    ctx.fillText(lbl2, c2.x - 15, c2.y - 8);
-    ctx.fillText(lbl3, c3.x - 55, c3.y + 4);
-}
-
-function log(t) {
-    const chatBox = document.getElementById("chat");
-    chatBox.innerHTML += `<div>${t}</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function voice() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-        alert("Trình duyệt của bạn chưa hỗ trợ Voice!");
-        return;
-    }
-
+@@ -180,7 +169,6 @@
     let startMsg = "Xin chào, tôi có thể giúp gì cho bạn";
     log("🤖 " + startMsg);
 
+    // Phát lời chào trước, khi nói xong mới bắt đầu bật Micro để không bị thu nhiễu
     window.speechSynthesis.cancel();
     let u = new SpeechSynthesisUtterance(startMsg);
     u.lang = "vi-VN";
-    u.rate = 0.95;
-
-    u.onend = () => {
+@@ -190,7 +178,7 @@
         log("🔴 <i>Đang nghe...</i>");
         let r = new SR();
         r.lang = "vi-VN"; 
+        r.continuous = true; // Kéo dài thời gian lắng nghe
         r.continuous = true;
         r.interimResults = false;
 
         r.onresult = e => {
-            let text = e.results[e.results.length - 1][0].transcript;
-            r.stop();
+@@ -199,7 +187,6 @@
             processFullVoiceNLP(text);
         };
 
+        // Khi người dùng không nói hoặc xảy ra lỗi thu âm
         r.onerror = () => {
             let errorMsg = "Chưa nhận diện được thông số, vui lòng thử lại!";
             log("🤖 " + errorMsg);
-            speak(errorMsg);
-        };
-
-        r.start();
-    };
-
-    window.speechSynthesis.speak(u);
-}
-
+@@ -215,21 +202,18 @@
 function processFullVoiceNLP(t) {
     log("👤 " + t);
-    
-    // Chuẩn hóa văn bản: thay thế các từ phát âm nói sang định dạng ký hiệu chuẩn
 
-    // 1. Chuẩn hóa chuỗi văn bản nhận diện
+    // Chuẩn hóa từ ngữ tự nhiên sang định dạng chuẩn
+    // Chuẩn hóa văn bản: thay thế các từ phát âm nói sang định dạng ký hiệu chuẩn
     let str = t.toLowerCase()
                .replace(/\b(âm|trừ)\b/g, "-")
+               .replace(/\bphẩy\b/g, ",")
                .replace(/\bphẩy\b/g, ".")
                .replace(/\bchấm\b/g, ".");
-               .replace(/\bphẩy\b/g, ",")
-               .replace(/\bchấm\b/g, "");
-
-    // 2. Xóa bỏ toàn bộ dấu chấm phân cách hàng nghìn (VD: "5.007,5" -> "5007,5")
-    // Giữ nguyên phần thập phân đứng sau dấu phẩy
-    str = str.replace(/(\d+)\.(\d{3})/g, '$1$2');
 
     let updatedCount = 0;
 
+    // Hàm làm sạch chuỗi số (xử lý số âm, số thập phân -2007,5 hay -2007.5)
     // Trích xuất số chuẩn (Bao gồm cả số âm và số thập phân như -2007.5)
-    // Hàm làm sạch và định dạng số chính xác về dạng Javascript float
     const cleanNumberString = (numStr) => {
         if (!numStr) return "0";
+        numStr = numStr.trim();
+        if (/^-?\d+[.,]\d{3}$/.test(numStr)) {
+            return numStr.replace(/[.,]/g, '');
+        }
         numStr = numStr.trim().replace(/\s+/g, '');
-        // Chuyển dấu phẩy thập phân sang dấu chấm tiêu chuẩn của thẻ Input HTML
         return numStr.replace(',', '.');
     };
 
-    const findVal = (keywords) => {
-        for (let kw of keywords) {
-            // Match số âm, số nguyên hoặc số thập phân có chứa dấu phẩy/chấm
+@@ -238,22 +222,21 @@
             let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\s*\\d+(?:[.,]\\d+)?)`, "i");
             let match = str.match(regex);
             if (match) {
-@@ -228,12 +234,12 @@
+                let valStr = match[1].replace(/\s+/g, '');
+                return cleanNumberString(valStr);
+                return cleanNumberString(match[1]);
+            }
+        }
         return null;
     };
 
+    // 1. Nhận diện Orientation (X, Y, Z)
+    if (str.includes("hướng x") || str.includes("trục x") || str.includes("ori x")) { setOri('X'); updatedCount++; }
+    else if (str.includes("hướng y") || str.includes("trục y") || str.includes("ori y")) { setOri('Y'); updatedCount++; }
+    else if (str.includes("hướng z") || str.includes("trục z") || str.includes("ori z")) { setOri('Z'); updatedCount++; }
     // 1. Nhận diện Orientation (Nhận diện linh hoạt từ ngữ tự nhiên)
-    // 1. Nhận diện Orientation
     if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?x\b/i.test(str)) { setOri('X'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?y\b/i.test(str)) { setOri('Y'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?(z|zét|zed)\b/i.test(str)) { setOri('Z'); updatedCount++; }
 
-    // 2. Nhận diện Position (X, Y, Z - Khắc phục các từ bị nhận diện sai/nhầm âm)
     // 2. Nhận diện Position (X, Y, Z)
+    let posX = findVal(["vị trí x", "pos x", "tọa độ x", "position x", "x"]);
+    let posY = findVal(["vị trí y", "pos y", "tọa độ y", "position y", "y"]);
+    let posZ = findVal(["vị trí z", "pos z", "tọa độ z", "position z", "z"]);
+    // 2. Nhận diện Position (X, Y, Z - Khắc phục các từ bị nhận diện sai/nhầm âm)
     let posX = findVal(["tọa độ x", "vị trí x", "pos x", "position x", "đồ ít", "tọa độ ít", "tọa độ xy", "x"]);
     let posY = findVal(["tọa độ y", "vị trí y", "pos y", "position y", "y"]);
     let posZ = findVal(["tọa độ zét", "tọa độ zed", "tọa độ z", "vị trí z", "pos z", "position z", "z"]);
-@@ -271,130 +277,130 @@
+
+    if (posX !== null) { document.getElementById("px").value = posX; updatedCount++; }
+    if (posY !== null) { document.getElementById("py").value = posY; updatedCount++; }
+@@ -288,7 +271,7 @@
         updatedCount++;
     }
 
+    // 5. Nếu nói chuỗi số tự do (Ví dụ: "-2007.5 1000 500")
     // 5. Nếu nói chuỗi số tự do (Bao gồm số âm và số thập phân)
-    // 5. Nếu nói chuỗi số tự do (VD: "-5007,5 2000 2003")
     if (updatedCount === 0) {
         let rawNums = str.match(/-?\d+([.,]\d+)?/g);
         if (rawNums && rawNums.length >= 3) {
-            document.getElementById("dx").value = cleanNumberString(rawNums[0]);
-            document.getElementById("dy").value = cleanNumberString(rawNums[1]);
-            document.getElementById("dz").value = cleanNumberString(rawNums[2]);
-            updatedCount = 3;
-        }
-    }
-
-    // Phản hồi kết quả
-    if (updatedCount > 0) {
-        draw();
-        let successMsg = "File của bạn đã được tạo xong";
-        log("🤖 " + successMsg);
-        speak(successMsg);
-    } else {
-        let failMsg = "Chưa nhận diện được thông số, vui lòng thử lại!";
-        log("🤖 " + failMsg);
-        speak(failMsg);
-    }
-}
-
-function speak(t) {
-    window.speechSynthesis.cancel();
-    let u = new SpeechSynthesisUtterance(t);
-    u.lang = "vi-VN";
-    u.rate = 0.95;
-    window.speechSynthesis.speak(u);
-}
-
-/* 4. CHỈNH SỬA CHUẨN ORI KHI XUẤT FILE .MAC THEO ĐÚNG HƯỚNG ĐƯỢC CHỌN */
-function saveFile() {
-    let px = parseInputValue("px");
-    let py = parseInputValue("py");
-    let pz = parseInputValue("pz");
-
-    let L = parseInputValue("dx");
-    let W = parseInputValue("dy");
-    let H = parseInputValue("dz");
-
-    let r1 = parseInputValue("r1");
-    let r2 = parseInputValue("r2");
+@@ -335,84 +318,83 @@
     let r3 = parseInputValue("r3");
     let r4 = parseInputValue("r4");
 
+    // Xác định chính xác chuỗi ORI theo biến ORI đang được chọn
     let oriStr = "ORI Y is Y and Z is Z";
     if (ORI === "X") {
         oriStr = "ORI Y is Y and Z is X";
