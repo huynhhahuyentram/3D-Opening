@@ -201,24 +201,30 @@ function voice() {
 
 function processFullVoiceNLP(t) {
     log("👤 " + t);
-    
-    // Chuẩn hóa văn bản: thay thế các từ phát âm nói sang định dạng ký hiệu chuẩn
+
+    // 1. Chuẩn hóa chuỗi văn bản nhận diện
     let str = t.toLowerCase()
                .replace(/\b(âm|trừ)\b/g, "-")
-               .replace(/\bphẩy\b/g, ".")
-               .replace(/\bchấm\b/g, ".");
+               .replace(/\bphẩy\b/g, ",")
+               .replace(/\bchấm\b/g, "");
+
+    // 2. Xóa bỏ toàn bộ dấu chấm phân cách hàng nghìn (VD: "5.007,5" -> "5007,5")
+    // Giữ nguyên phần thập phân đứng sau dấu phẩy
+    str = str.replace(/(\d+)\.(\d{3})/g, '$1$2');
 
     let updatedCount = 0;
 
-    // Trích xuất số chuẩn (Bao gồm cả số âm và số thập phân như -2007.5)
+    // Hàm làm sạch và định dạng số chính xác về dạng Javascript float
     const cleanNumberString = (numStr) => {
         if (!numStr) return "0";
         numStr = numStr.trim().replace(/\s+/g, '');
+        // Chuyển dấu phẩy thập phân sang dấu chấm tiêu chuẩn của thẻ Input HTML
         return numStr.replace(',', '.');
     };
 
     const findVal = (keywords) => {
         for (let kw of keywords) {
+            // Match số âm, số nguyên hoặc số thập phân có chứa dấu phẩy/chấm
             let regex = new RegExp(`${kw}(?:\\s+là|\\s+bằng|\\s*[:=])?\\s*(-?\\s*\\d+(?:[.,]\\d+)?)`, "i");
             let match = str.match(regex);
             if (match) {
@@ -228,12 +234,12 @@ function processFullVoiceNLP(t) {
         return null;
     };
 
-    // 1. Nhận diện Orientation (Nhận diện linh hoạt từ ngữ tự nhiên)
+    // 1. Nhận diện Orientation
     if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?x\b/i.test(str)) { setOri('X'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?y\b/i.test(str)) { setOri('Y'); updatedCount++; }
     else if (/(trục|hướng|ori|trục tọa độ)\s*(theo\s*trục\s*)?(z|zét|zed)\b/i.test(str)) { setOri('Z'); updatedCount++; }
 
-    // 2. Nhận diện Position (X, Y, Z - Khắc phục các từ bị nhận diện sai/nhầm âm)
+    // 2. Nhận diện Position (X, Y, Z)
     let posX = findVal(["tọa độ x", "vị trí x", "pos x", "position x", "đồ ít", "tọa độ ít", "tọa độ xy", "x"]);
     let posY = findVal(["tọa độ y", "vị trí y", "pos y", "position y", "y"]);
     let posZ = findVal(["tọa độ zét", "tọa độ zed", "tọa độ z", "vị trí z", "pos z", "position z", "z"]);
@@ -271,7 +277,7 @@ function processFullVoiceNLP(t) {
         updatedCount++;
     }
 
-    // 5. Nếu nói chuỗi số tự do (Bao gồm số âm và số thập phân)
+    // 5. Nếu nói chuỗi số tự do (VD: "-5007,5 2000 2003")
     if (updatedCount === 0) {
         let rawNums = str.match(/-?\d+([.,]\d+)?/g);
         if (rawNums && rawNums.length >= 3) {
