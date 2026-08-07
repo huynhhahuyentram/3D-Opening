@@ -49,7 +49,6 @@ function draw() {
     if (ORI === "Z") {
         drawBox3DSharp(cx, cy, l, w, h, `L=${L}`, `W=${W}`, `H=${H}`);
     } else if (ORI === "X") {
-        // Đã chỉnh sửa: Mặt vuông góc trục X có tiết diện W (Y) và H (Z), độ đùn sâu theo L (X)
         drawBox3DSharp(cx, cy, h, w, l, `H=${H}`, `W=${W}`, `L=${L}`);
     } else if (ORI === "Y") {
         drawBox3DSharp(cx, cy, l, h, w, `L=${L}`, `H=${H}`, `W=${W}`);
@@ -201,7 +200,6 @@ function processFullVoiceNLP(t) {
     let str = t.toLowerCase();
     let updatedCount = 0;
 
-    // Sửa xử lý chuẩn hóa số: xóa phân cách hàng nghìn (5.000 / 5,000 -> 5000)
     const cleanNumberString = (numStr) => {
         if (/^\d+[.,]\d{3}$/.test(numStr)) {
             return numStr.replace(/[.,]/g, '');
@@ -317,7 +315,7 @@ PTSP unset
 INSC unset
 
 NEW EXTRUSION
-${oriStr}
+ORI Y is -Y and Z is Z
 LEVE 0 2
 HEIG ${H}mm
 
