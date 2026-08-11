@@ -599,6 +599,14 @@ function help() {
 
 
 
+// Dữ liệu mẫu ban đầu
+let documents = [
+    { id: 1, name: "Phần mềm tạo Opening", link: "https://drive.google.com", tags: ["tool", "opening"] },
+    { id: 2, name: "Phương pháp boarding Retractable", link: "https://drive.google.com", tags: ["boarding", "method"] },
+    { id: 3, name: "IACS Rec.47", link: "https://drive.google.com", tags: ["standard", "iacs"] },
+    { id: 4, name: "Phương pháp boarding Wet Unit", link: "https://drive.google.com", tags: ["boarding", "wet unit"] }
+];
+
 // Mở và đóng Modal
 function openLibraryModal() {
     document.getElementById('libraryModal').classList.add('active');
@@ -689,4 +697,3 @@ function refreshDocs() {
 // Tìm kiếm bằng giọng nói (Giả lập)
 function startVoiceSearch() {
     alert("Đang lắng nghe... Hãy nói tên tài liệu!");
-}
