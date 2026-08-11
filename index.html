@@ -143,6 +143,34 @@
     </div>
 </div>
 
+<!-- 1. KHỞI TẠO FIREBASE TRƯỚC -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+  import { 
+    getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc 
+  } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbbPaSakecB3z-dqQ3FfhS6prHKICCFeA",
+    authDomain: "d-opening-tool.firebaseapp.com",
+    projectId: "d-opening-tool",
+    storageBucket: "d-opening-tool.firebasestorage.app",
+    messagingSenderId: "242030973735",
+    appId: "1:242030973735:web:d48715738f5709963e4f02",
+    measurementId: "G-M384KGE56Z"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.fs = { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc };
+</script>
+
+<!-- 2. NẠP FILE JS CỦA BẠN SAU CÙNG -->
 <script src="script.js"></script>
+
+</body>
+</html>
 </body>
 </html>
