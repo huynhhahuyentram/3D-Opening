@@ -73,11 +73,61 @@
             <button class="export" onclick="saveFile()">📤 Export</button>
             <button class="voice" onclick="voice()" id="voiceBtn">🎤 Voice</button>
             <button class="reset" onclick="reset()">🔄 Reset</button>
-            <button class="library" onclick="library()">📚 Library</button>
+            <button class="library" onclick="openLibraryModal()">📚 Library</button>
             <button class="help" onclick="help()">❓ Help</button>
         </div>
 
         <div id="chat"></div>
+    </div>
+</div>
+
+<!-- DOCUMENT LIBRARY MODAL -->
+<div id="libraryModal" class="modal-overlay">
+    <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>📚 Document Library</h2>
+            <button class="close-btn" onclick="closeLibraryModal()">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Alert Status -->
+            <div class="status-alert">
+                <span>✅ Loaded <strong id="docCount">4</strong> documents</span>
+                <button class="btn btn-purple-sm" onclick="refreshDocs()">🔄 Refresh</button>
+            </div>
+
+            <!-- Search Bar Section -->
+            <div class="search-section">
+                <label class="section-label">🔍 Search Documents</label>
+                <div class="search-controls">
+                    <input type="text" id="searchInput" placeholder="Search by name or tags..." onkeyup="filterDocs()">
+                    <div class="search-actions">
+                        <button class="btn btn-cyan" onclick="startVoiceSearch()">🎤 Voice</button>
+                        <button class="btn btn-purple" onclick="filterDocs()">🔍 Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Document Form -->
+            <div class="add-doc-form">
+                <input type="text" id="docNameInput" placeholder="Document name...">
+                <input type="text" id="docLinkInput" placeholder="Drive link...">
+                <input type="text" id="docTagsInput" placeholder="Tags (comma sep)...">
+                <button class="btn btn-purple" onclick="addDocument()">➕ Add</button>
+            </div>
+
+            <!-- Document List -->
+            <div class="doc-list" id="docList">
+                <!-- Javascript sẽ render danh sách ở đây -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-text-close" onclick="closeLibraryModal()">Close</button>
+        </div>
     </div>
 </div>
 
