@@ -599,14 +599,16 @@ input[type=number] {
 
 /* ADD / EDIT DOCUMENT FORM */
 .add-doc-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
+    display: flex;
     gap: 8px;
     margin-bottom: 20px;
     align-items: center;
+    width: 100%;
 }
 
 .add-doc-form input {
+    flex: 1; /* Các input tự co giãn đều nhau */
+    min-width: 0; /* Ngăn input tràn khi nội dung chữ quá dài */
     background: #1e293b;
     border: 1px solid #334155;
     border-radius: 8px;
@@ -623,6 +625,7 @@ input[type=number] {
 .form-btn-group {
     display: flex;
     gap: 6px;
+    flex-shrink: 0; /* Giữ cố định kích thước các nút bấm không bị bóp nghẹt */
 }
 
 /* BUTTON STYLES */
