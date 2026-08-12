@@ -663,7 +663,7 @@ function updateCategoryBadges() {
         if (counts[dept] !== undefined) counts[dept]++;
     });
 
-    // Render Badge Counts (Thêm kiểm tra phần tử trước khi gán để tránh lỗi)
+    // Render Badge Counts
     if (document.getElementById('count-all')) document.getElementById('count-all').innerText = counts['all'];
     if (document.getElementById('count-cat-rules')) document.getElementById('count-cat-rules').innerText = counts['Rules & Standards'];
     if (document.getElementById('count-cat-methods')) document.getElementById('count-cat-methods').innerText = counts['Methods'];
@@ -697,7 +697,15 @@ function highlightActiveMenu(element) {
     if (element) element.classList.add('active');
 }
 
-// 3. Render Danh Sách đã Lọc
+// 3. Render Danh Sách đã Lọc & Thoát Tìm kiếm
+function resetSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    filterDocs();
+}
+
 function filterDocs() {
     updateCategoryBadges();
     const searchInput = document.getElementById('searchInput');
