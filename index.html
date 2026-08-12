@@ -83,26 +83,95 @@
 
 <!-- DOCUMENT LIBRARY MODAL -->
 <div id="libraryModal" class="modal-overlay">
-    <div class="modal-content">
-        <!-- Input ẩn phục vụ cho tính năng Chỉnh sửa (Edit) -->
-        <input type="hidden" id="editingDocId" value="">
-
-        <!-- Header -->
-        <div class="modal-header">
-            <h2>📚 Document Library</h2>
-            <button class="close-btn" onclick="closeLibraryModal()">&times;</button>
-        </div>
-
-        <!-- Body -->
-        <div class="modal-body">
-            <!-- Alert Status (Đã bỏ nút Refresh) -->
-            <div class="status-alert">
+    <div class="modal-content library-layout">
+        <!-- Sidebar Navigation (Categories, Department, Tools) -->
+        <aside class="library-sidebar">
+            <div class="sidebar-header">
+                <h2>📚 LIBRARY</h2>
+            </div>
+            
+            <div class="sidebar-status status-alert">
                 <span>✅ Loaded <strong id="docCount">0</strong> documents</span>
+            </div>
+
+            <div class="sidebar-scroll-area">
+                <!-- CATEGORIES SECTION -->
+                <div class="menu-group">
+                    <div class="menu-title">📁 CATEGORIES</div>
+                    <button class="menu-item active" data-filter="all" onclick="selectCategory('all', this)">
+                        <span>📄 All Documents</span>
+                        <span class="badge" id="count-all">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="cat-rules" onclick="selectCategory('Rules & Standards', this)">
+                        <span>📋 Rules & Standards</span>
+                        <span class="badge" id="count-cat-rules">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="cat-methods" onclick="selectCategory('Methods', this)">
+                        <span>🔧 Methods</span>
+                        <span class="badge" id="count-cat-methods">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="cat-experience" onclick="selectCategory('Experience', this)">
+                        <span>💡 Experience</span>
+                        <span class="badge" id="count-cat-experience">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="cat-others" onclick="selectCategory('Cat-Others', this)">
+                        <span>📎 Others</span>
+                        <span class="badge" id="count-cat-others">0</span>
+                    </button>
+                </div>
+
+                <!-- BY DEPARTMENT SECTION -->
+                <div class="menu-group">
+                    <div class="menu-title">🏗️ BY DEPARTMENT</div>
+                    <button class="menu-item" data-filter="dept-hull" onclick="selectDepartment('Hull', this)">
+                        <span>🚢 Hull</span>
+                        <span class="badge" id="count-dept-hull">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="dept-piping" onclick="selectDepartment('Piping', this)">
+                        <span>🔧 Piping</span>
+                        <span class="badge" id="count-dept-piping">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="dept-electrical" onclick="selectDepartment('Electrical', this)">
+                        <span>⚡ Electrical</span>
+                        <span class="badge" id="count-dept-electrical">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="dept-outfitting" onclick="selectDepartment('Outfitting', this)">
+                        <span>⚒️ Outfitting</span>
+                        <span class="badge" id="count-dept-outfitting">0</span>
+                    </button>
+                    <button class="menu-item" data-filter="dept-others" onclick="selectDepartment('Dept-Others', this)">
+                        <span>📎 Others</span>
+                        <span class="badge" id="count-dept-others">0</span>
+                    </button>
+                </div>
+
+                <!-- TOOLS SECTION -->
+                <div class="menu-group">
+                    <div class="menu-title">⚒️ TOOLS</div>
+                    <a href="https://drive.google.com" target="_blank" class="tool-card">
+                        <div class="tool-info">
+                            <span class="tool-icon">🧊</span>
+                            <div>
+                                <strong>3D Opening Tool</strong>
+                                <small>Click to download tool</small>
+                            </div>
+                        </div>
+                        <span class="download-icon">⬇️</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="library-main">
+            <!-- Header -->
+            <div class="modal-header">
+                <h2>Document List</h2>
+                <button class="close-btn" onclick="closeLibraryModal()">&times;</button>
             </div>
 
             <!-- Search Bar Section -->
             <div class="search-section">
-                <label class="section-label">🔍 Search Documents</label>
                 <div class="search-controls">
                     <input type="text" id="searchInput" placeholder="Search by name or tags..." onkeyup="filterDocs()">
                     <div class="search-actions">
@@ -113,34 +182,50 @@
             </div>
 
             <!-- Add / Edit Document Form -->
-            <div class="add-doc-form">
-                <input type="text" id="docNameInput" placeholder="Document name...">
-                <input type="text" id="docLinkInput" placeholder="Drive link...">
-                <input type="text" id="docTagsInput" placeholder="Tags (comma sep)...">
-                <div class="form-btn-group">
-                    <button class="btn btn-purple" id="saveDocBtn" onclick="addDocument()">➕ Add</button>
-                    <button class="btn btn-cancel-edit" id="cancelEditBtn" onclick="cancelEdit()" style="display: none;">Cancel</button>
+            <div class="add-doc-form-wrapper">
+                <input type="hidden" id="editingDocId" value="">
+                <div class="form-row">
+                    <input type="text" id="docNameInput" placeholder="Document name...">
+                    <input type="text" id="docLinkInput" placeholder="Drive link...">
+                    <input type="text" id="docTagsInput" placeholder="Tags (comma sepa)...">
+                </div>
+                <div class="form-row margin-top">
+                    <select id="docCategorySelect" class="form-select">
+                        <option value="Rules & Standards">📋 Rules & Standards</option>
+                        <option value="Methods">🔧 Methods</option>
+                        <option value="Experience">💡 Experience</option>
+                        <option value="Cat-Others" selected>📎 Others (Category)</option>
+                    </select>
+                    <select id="docDepartmentSelect" class="form-select">
+                        <option value="Hull">🚢 Hull</option>
+                        <option value="Piping">🔧 Piping</option>
+                        <option value="Electrical">⚡ Electrical</option>
+                        <option value="Outfitting">⚒️ Outfitting</option>
+                        <option value="Dept-Others" selected>📎 Others (Department)</option>
+                    </select>
+                    <div class="form-btn-group">
+                        <button class="btn btn-purple" id="saveDocBtn" onclick="addDocument()">➕ Add</button>
+                        <button class="btn btn-delete" id="cancelEditBtn" onclick="cancelEdit()" style="display: none;">✕ Cancel</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Document List Box -->
             <div class="doc-list-wrapper">
                 <div class="doc-list" id="docList">
-                    <!-- Javascript sẽ render danh sách ở đây -->
+                    <!-- Dynamic rendering -->
                 </div>
-                
-                <!-- Footer của danh sách chứa nút Clear All -->
-                
             </div>
-        </div>
 
-        <!-- Modal Footer -->
-        <div class="modal-footer">
-            <button class="btn-text-close" onclick="closeLibraryModal()">Close</button>
-        </div>
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="btn-text-close" onclick="closeLibraryModal()">Close</button>
+            </div>
+        </main>
     </div>
 </div>
 
+    
 <!-- 1. KHỞI TẠO FIREBASE TRƯỚC -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
