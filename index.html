@@ -148,7 +148,7 @@
                 <!-- TOOLS SECTION -->
                 <div class="menu-group">
                     <div class="menu-title">⚒️ TOOLS</div>
-                    <a href="https://drive.google.com" target="_blank" class="tool-card">
+                    <a href="https://drive.google.com/file/d/1cJXClRvV5bKBLhSR-JwOjLp_wbh5Kll0/view?usp=sharing" target="_blank" class="tool-card">
                         <div class="tool-info">
                             <span class="tool-icon">🧊</span>
                             <div>
@@ -171,14 +171,16 @@
             </div>
 
             <!-- Search Bar Section -->
-            <div class="search-section">
-                <div class="search-controls">
-                    <input type="text" id="searchInput" placeholder="Search by name or tags..." onkeyup="filterDocs()">
-                    <div class="search-actions">
-                        <button class="btn btn-cyan" onclick="startVoiceSearch()">🎤 Voice</button>
-                        <button class="btn btn-purple" onclick="filterDocs()">🔍 Search</button>
-                    </div>
+            <div class="search-actions" style="display: flex; gap: 10px; align-items: center;">
+                <div style="position: relative; flex: 1; display: flex; align-items: center;">
+                    <input type="text" id="searchInput" placeholder="Search by name or tags..." oninput="filterDocs()" 
+                           style="width: 100%; padding: 10px 38px 10px 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 14px; outline: none; transition: all 0.3s ease;">
+                    <button onclick="resetSearch()" title="Reset / Thoát tìm kiếm" 
+                            style="position: absolute; right: 10px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 15px; opacity: 0.7; transition: opacity 0.2s;"
+                            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">🔄</button>
                 </div>
+                <button class="btn btn-cyan" onclick="startVoiceSearch()">🎤 Voice</button>
+                <button class="btn btn-purple" onclick="filterDocs()">🔍 Search</button>
             </div>
 
             <!-- Add / Edit Document Form -->
@@ -225,7 +227,6 @@
     </div>
 </div>
 
-    
 <!-- 1. KHỞI TẠO FIREBASE TRƯỚC -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -253,7 +254,5 @@
 <!-- 2. NẠP FILE JS CỦA BẠN SAU CÙNG -->
 <script src="script.js"></script>
 
-</body>
-</html>
 </body>
 </html>
